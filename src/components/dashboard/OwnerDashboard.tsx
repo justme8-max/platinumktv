@@ -13,6 +13,12 @@ import RealtimeRevenueChart from "./RealtimeRevenueChart";
 export default function OwnerDashboard() {
   const [stats, setStats] = useState({
     revenue: 0,
+    dailyRevenue: 0,
+    monthlyRevenue: 0,
+    yearlyRevenue: 0,
+    dailyGrowth: 0,
+    monthlyGrowth: 0,
+    yearlyGrowth: 0,
     rooms: 0,
     activeUsers: 0,
     occupancy: 0,
@@ -45,19 +51,80 @@ export default function OwnerDashboard() {
       }));
     }
 
-    // Load revenue (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    // Load revenue with different time periods
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    
+    const thisYearStart = new Date(now.getFullYear(), 0, 1);
+    const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
+    const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
 
-    const { data: transactionsData } = await supabase
+    // Daily revenue (today)
+    const { data: todayData } = await supabase
       .from("transactions")
       .select("amount")
-      .gte("created_at", thirtyDaysAgo.toISOString());
+      .gte("created_at", today.toISOString());
 
-    if (transactionsData) {
-      const total = transactionsData.reduce((sum, t) => sum + Number(t.amount), 0);
-      setStats(prev => ({ ...prev, revenue: total }));
-    }
+    // Yesterday revenue
+    const { data: yesterdayData } = await supabase
+      .from("transactions")
+      .select("amount")
+      .gte("created_at", yesterday.toISOString())
+      .lt("created_at", today.toISOString());
+
+    // Monthly revenue
+    const { data: monthData } = await supabase
+      .from("transactions")
+      .select("amount")
+      .gte("created_at", thisMonthStart.toISOString());
+
+    // Last month revenue
+    const { data: lastMonthData } = await supabase
+      .from("transactions")
+      .select("amount")
+      .gte("created_at", lastMonthStart.toISOString())
+      .lte("created_at", lastMonthEnd.toISOString());
+
+    // Yearly revenue
+    const { data: yearData } = await supabase
+      .from("transactions")
+      .select("amount")
+      .gte("created_at", thisYearStart.toISOString());
+
+    // Last year revenue
+    const { data: lastYearData } = await supabase
+      .from("transactions")
+      .select("amount")
+      .gte("created_at", lastYearStart.toISOString())
+      .lte("created_at", lastYearEnd.toISOString());
+
+    const todayTotal = todayData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+    const yesterdayTotal = yesterdayData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+    const monthTotal = monthData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+    const lastMonthTotal = lastMonthData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+    const yearTotal = yearData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+    const lastYearTotal = lastYearData?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+
+    const dailyGrowth = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100 : 0;
+    const monthlyGrowth = lastMonthTotal > 0 ? ((monthTotal - lastMonthTotal) / lastMonthTotal) * 100 : 0;
+    const yearlyGrowth = lastYearTotal > 0 ? ((yearTotal - lastYearTotal) / lastYearTotal) * 100 : 0;
+
+    setStats(prev => ({
+      ...prev,
+      revenue: monthTotal,
+      dailyRevenue: todayTotal,
+      monthlyRevenue: monthTotal,
+      yearlyRevenue: yearTotal,
+      dailyGrowth,
+      monthlyGrowth,
+      yearlyGrowth,
+    }));
 
     // Load active users count
     const { count } = await supabase
@@ -98,12 +165,53 @@ export default function OwnerDashboard() {
           <p className="text-muted-foreground">Gambaran lengkap bisnis Anda</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            title="Total Omset (30 Hari)"
-            value={`Rp ${stats.revenue.toLocaleString()}`}
-            icon={DollarSign}
-          />
+        {/* Large Revenue Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/20 rounded-xl p-8 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-muted-foreground">Omset Hari Ini</h3>
+              <DollarSign className="h-8 w-8 text-primary" />
+            </div>
+            <p className="text-5xl font-bold mb-3">Rp {stats.dailyRevenue.toLocaleString()}</p>
+            <div className="flex items-center gap-2">
+              <TrendingUp className={`h-5 w-5 ${stats.dailyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+              <span className={`text-sm font-medium ${stats.dailyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {stats.dailyGrowth >= 0 ? '+' : ''}{stats.dailyGrowth.toFixed(1)}% vs kemarin
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-background border-2 border-blue-500/20 rounded-xl p-8 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-muted-foreground">Omset Bulan Ini</h3>
+              <DollarSign className="h-8 w-8 text-blue-500" />
+            </div>
+            <p className="text-5xl font-bold mb-3">Rp {stats.monthlyRevenue.toLocaleString()}</p>
+            <div className="flex items-center gap-2">
+              <TrendingUp className={`h-5 w-5 ${stats.monthlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+              <span className={`text-sm font-medium ${stats.monthlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {stats.monthlyGrowth >= 0 ? '+' : ''}{stats.monthlyGrowth.toFixed(1)}% vs bulan lalu
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-background border-2 border-purple-500/20 rounded-xl p-8 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-muted-foreground">Omset Tahun Ini</h3>
+              <DollarSign className="h-8 w-8 text-purple-500" />
+            </div>
+            <p className="text-5xl font-bold mb-3">Rp {stats.yearlyRevenue.toLocaleString()}</p>
+            <div className="flex items-center gap-2">
+              <TrendingUp className={`h-5 w-5 ${stats.yearlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+              <span className={`text-sm font-medium ${stats.yearlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {stats.yearlyGrowth >= 0 ? '+' : ''}{stats.yearlyGrowth.toFixed(1)}% vs tahun lalu
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Smaller Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatsCard
             title="Total Ruangan"
             value={stats.rooms}
