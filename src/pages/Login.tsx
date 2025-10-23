@@ -1,0 +1,92 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Music } from "lucide-react";
+import loginBg from "@/assets/login-background.png";
+
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast.success("Welcome back!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign in");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-start p-16 relative"
+      style={{
+        backgroundImage: `url(${loginBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="w-full max-w-sm relative z-10 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-5xl font-semibold text-white tracking-tight">Platinum High KTV</h1>
+          <p className="text-base text-white/80">
+            Sign in to continue
+          </p>
+        </div>
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-white/90 text-sm font-normal">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="h-12 bg-white/95 border-0 rounded-xl text-base shadow-sm focus-visible:ring-1"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-white/90 text-sm font-normal">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="h-12 bg-white/95 border-0 rounded-xl text-base shadow-sm focus-visible:ring-1"
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full h-12 bg-white/95 text-foreground hover:bg-white rounded-xl font-medium shadow-sm transition-all"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}

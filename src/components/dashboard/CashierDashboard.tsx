@@ -1,0 +1,215 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import DashboardLayout from "./DashboardLayout";
+import StatsCard from "./StatsCard";
+import RoomCard from "./RoomCard";
+import RoomDetailDialog from "./RoomDetailDialog";
+import { Button } from "@/components/ui/button";
+import { DollarSign, Clock, CreditCard, Info } from "lucide-react";
+import { toast } from "sonner";
+
+export default function CashierDashboard() {
+  const [stats, setStats] = useState({
+    todayTransactions: 0,
+    todayRevenue: 0,
+    activeRooms: 0,
+  });
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+
+  useEffect(() => {
+    loadDashboardData();
+
+    // Setup realtime subscriptions
+    const roomsChannel = supabase
+      .channel('rooms-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rooms',
+        },
+        () => loadDashboardData()
+      )
+      .subscribe();
+
+    const transactionsChannel = supabase
+      .channel('transactions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'transactions',
+        },
+        () => loadDashboardData()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(roomsChannel);
+      supabase.removeChannel(transactionsChannel);
+    };
+  }, []);
+
+  const loadDashboardData = async () => {
+    // Load rooms
+    const { data: roomsData } = await supabase
+      .from("rooms")
+      .select("*")
+      .order("room_number");
+
+    if (roomsData) {
+      setRooms(roomsData);
+      const active = roomsData.filter(r => r.status === "occupied").length;
+      setStats(prev => ({ ...prev, activeRooms: active }));
+    }
+
+    // Load today's transactions
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { data: transactionsData } = await supabase
+      .from("transactions")
+      .select("amount")
+      .gte("created_at", today.toISOString());
+
+    if (transactionsData) {
+      const total = transactionsData.reduce((sum, t) => sum + Number(t.amount), 0);
+      setStats(prev => ({
+        ...prev,
+        todayTransactions: transactionsData.length,
+        todayRevenue: total,
+      }));
+    }
+  };
+
+  const handleRoomClick = (room: any) => {
+    setSelectedRoom(room);
+    setDetailDialogOpen(true);
+  };
+
+  const startRoomSession = async (roomId: string) => {
+    try {
+      const { error } = await supabase
+        .from("rooms")
+        .update({
+          status: "occupied",
+          current_session_start: new Date().toISOString(),
+        })
+        .eq("id", roomId);
+
+      if (error) throw error;
+
+      toast.success("Sesi ruangan dimulai");
+      loadDashboardData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const endRoomSession = async (roomId: string) => {
+    try {
+      const { data: room } = await supabase
+        .from("rooms")
+        .select("*")
+        .eq("id", roomId)
+        .single();
+
+      if (!room) return;
+
+      // Calculate duration and amount
+      const start = new Date(room.current_session_start);
+      const end = new Date();
+      const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+      const amount = Math.ceil(hours) * room.hourly_rate;
+
+      // Create transaction
+      const { data: { user } } = await supabase.auth.getUser();
+
+      await supabase.from("transactions").insert({
+        room_id: roomId,
+        cashier_id: user?.id,
+        transaction_type: "room_rental",
+        amount,
+        payment_method: "cash",
+        session_start: room.current_session_start,
+        session_end: end.toISOString(),
+        duration_hours: Math.ceil(hours),
+        description: `${room.room_name} - ${Math.ceil(hours)} hours`,
+      });
+
+      // Update room status
+      await supabase
+        .from("rooms")
+        .update({
+          status: "available",
+          current_session_start: null,
+        })
+        .eq("id", roomId);
+
+      toast.success(`Sesi selesai. Total: Rp ${amount.toLocaleString()}`);
+      loadDashboardData();
+      setDetailDialogOpen(false);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  return (
+    <DashboardLayout role="cashier">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Point of Sale</h2>
+          <p className="text-muted-foreground">Kelola pemesanan ruangan dan transaksi</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatsCard
+            title="Transaksi Hari Ini"
+            value={stats.todayTransactions}
+            icon={CreditCard}
+          />
+          <StatsCard
+            title="Omset Hari Ini"
+            value={`Rp ${stats.todayRevenue.toLocaleString()}`}
+            icon={DollarSign}
+          />
+          <StatsCard
+            title="Sesi Aktif"
+            value={stats.activeRooms}
+            icon={Clock}
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold">Ruangan</h3>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Info className="h-4 w-4" />
+              <p>Klik ruangan untuk melihat detail & pesanan</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {rooms.map((room) => (
+              <RoomCard
+                key={room.id}
+                room={room}
+                onClick={() => handleRoomClick(room)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <RoomDetailDialog
+        room={selectedRoom}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onUpdate={loadDashboardData}
+      />
+    </DashboardLayout>
+  );
+}
