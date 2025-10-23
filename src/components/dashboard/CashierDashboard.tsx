@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import RoomDetailDialog from "./RoomDetailDialog";
+import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, CreditCard, Info } from "lucide-react";
+import { DollarSign, Clock, CreditCard, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
 export default function CashierDashboard() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     todayTransactions: 0,
     todayRevenue: 0,
@@ -17,6 +21,7 @@ export default function CashierDashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [addItemsOpen, setAddItemsOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -89,6 +94,11 @@ export default function CashierDashboard() {
   const handleRoomClick = (room: any) => {
     setSelectedRoom(room);
     setDetailDialogOpen(true);
+  };
+
+  const handleAddItems = (room: any) => {
+    setSelectedRoom(room);
+    setAddItemsOpen(true);
   };
 
   const startRoomSession = async (roomId: string) => {

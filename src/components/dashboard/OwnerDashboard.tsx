@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, Users, Building2, UserPlus } from "lucide-react";
+import { DollarSign, TrendingUp, Users, Building2, UserPlus, Package, ShoppingCart } from "lucide-react";
 import EmployeeDialog from "@/components/employees/EmployeeDialog";
 import EmployeeList from "@/components/employees/EmployeeList";
 import RealtimeRevenueChart from "./RealtimeRevenueChart";
+import ProductList from "@/components/inventory/ProductList";
+import ProductDialog from "@/components/inventory/ProductDialog";
+import PurchaseOrderList from "@/components/purchase/PurchaseOrderList";
+import BestSellersChart from "@/components/analytics/BestSellersChart";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
 export default function OwnerDashboard() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     revenue: 0,
     dailyRevenue: 0,
@@ -27,6 +34,9 @@ export default function OwnerDashboard() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<any>(null);
+  const [productDialogOpen, setProductDialogOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState<any>(null);
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -156,13 +166,26 @@ export default function OwnerDashboard() {
     setEditEmployee(null);
   };
 
+  const handleProductDialogClose = () => {
+    setProductDialogOpen(false);
+    setEditProduct(null);
+  };
+
+  const handleEditProduct = (product: any) => {
+    setEditProduct(product);
+    setProductDialogOpen(true);
+  };
+
   return (
     <>
       <DashboardLayout role="owner">
         <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold mb-2">Dashboard Owner</h2>
-          <p className="text-muted-foreground">Gambaran lengkap bisnis Anda</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold mb-2">{t("Dashboard Owner", "Owner Dashboard")}</h2>
+            <p className="text-muted-foreground">{t("Gambaran lengkap bisnis Anda", "Complete business overview")}</p>
+          </div>
+          <LanguageSwitcher />
         </div>
 
         {/* Large Revenue Overview Cards */}
@@ -231,13 +254,34 @@ export default function OwnerDashboard() {
 
         <Tabs defaultValue="analytics" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="analytics">Analitik Real-time</TabsTrigger>
-            <TabsTrigger value="rooms">Ruangan</TabsTrigger>
-            <TabsTrigger value="employees">Karyawan</TabsTrigger>
+            <TabsTrigger value="analytics">{t("Analitik", "Analytics")}</TabsTrigger>
+            <TabsTrigger value="bestsellers">{t("Best Sellers", "Best Sellers")}</TabsTrigger>
+            <TabsTrigger value="inventory">{t("Inventory", "Inventory")}</TabsTrigger>
+            <TabsTrigger value="purchasing">{t("Purchasing", "Purchasing")}</TabsTrigger>
+            <TabsTrigger value="rooms">{t("Ruangan", "Rooms")}</TabsTrigger>
+            <TabsTrigger value="employees">{t("Karyawan", "Employees")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-4">
             <RealtimeRevenueChart />
+          </TabsContent>
+
+          <TabsContent value="bestsellers" className="space-y-4">
+            <BestSellersChart />
+          </TabsContent>
+
+          <TabsContent value="inventory" className="space-y-4">
+            <ProductList 
+              onAdd={() => setProductDialogOpen(true)}
+              onEdit={handleEditProduct}
+            />
+          </TabsContent>
+
+          <TabsContent value="purchasing" className="space-y-4">
+            <PurchaseOrderList 
+              onAdd={() => setPurchaseDialogOpen(true)}
+              userRole="owner"
+            />
           </TabsContent>
 
           <TabsContent value="rooms" className="space-y-4">
@@ -272,6 +316,13 @@ export default function OwnerDashboard() {
         onOpenChange={handleDialogClose}
         onSuccess={loadDashboardData}
         employee={editEmployee}
+      />
+
+      <ProductDialog
+        open={productDialogOpen}
+        onOpenChange={handleProductDialogClose}
+        onSuccess={loadDashboardData}
+        product={editProduct}
       />
     </>
   );

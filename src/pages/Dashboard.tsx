@@ -5,6 +5,8 @@ import { Loader2 } from "lucide-react";
 import OwnerDashboard from "@/components/dashboard/OwnerDashboard";
 import ManagerDashboard from "@/components/dashboard/ManagerDashboard";
 import CashierDashboard from "@/components/dashboard/CashierDashboard";
+import WaiterDashboard from "@/components/dashboard/WaiterDashboard";
+import AccountantDashboard from "@/components/dashboard/AccountantDashboard";
 
 export default function Dashboard() {
   const [role, setRole] = useState<string | null>(null);
@@ -51,6 +53,8 @@ export default function Dashboard() {
   if (role === "owner") return <OwnerDashboard />;
   if (role === "manager") return <ManagerDashboard />;
   if (role === "cashier") return <CashierDashboard />;
+  if (role === "waiter" || role === "waitress") return <WaiterDashboard />;
+  if (role === "accountant") return <AccountantDashboard />;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

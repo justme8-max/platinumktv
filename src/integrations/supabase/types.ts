@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name_en: string
+          name_id: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name_en: string
+          name_id: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name_en?: string
+          name_id?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           created_at: string | null
@@ -91,6 +118,68 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          category_id: string | null
+          cost: number
+          created_at: string | null
+          description_en: string | null
+          description_id: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          min_stock_level: number | null
+          name_en: string
+          name_id: string
+          price: number
+          sku: string
+          stock_quantity: number
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          cost: number
+          created_at?: string | null
+          description_en?: string | null
+          description_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          min_stock_level?: number | null
+          name_en: string
+          name_id: string
+          price: number
+          sku: string
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          cost?: number
+          created_at?: string | null
+          description_en?: string | null
+          description_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          min_stock_level?: number | null
+          name_en?: string
+          name_id?: string
+          price?: number
+          sku?: string
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -114,6 +203,96 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      purchase_order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string | null
+          purchase_order_id: string | null
+          quantity: number
+          subtotal: number
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          purchase_order_id?: string | null
+          quantity: number
+          subtotal: number
+          unit_cost: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          purchase_order_id?: string | null
+          quantity?: number
+          subtotal?: number
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          po_number: string
+          requested_at: string | null
+          requested_by: string | null
+          status: Database["public"]["Enums"]["purchase_status"] | null
+          supplier_name: string
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          po_number: string
+          requested_at?: string | null
+          requested_by?: string | null
+          status?: Database["public"]["Enums"]["purchase_status"] | null
+          supplier_name: string
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          po_number?: string
+          requested_at?: string | null
+          requested_by?: string | null
+          status?: Database["public"]["Enums"]["purchase_status"] | null
+          supplier_name?: string
+          total_amount?: number
           updated_at?: string | null
         }
         Relationships: []
@@ -159,6 +338,95 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      sales_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string | null
+          quantity: number
+          subtotal: number
+          transaction_id: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          quantity: number
+          subtotal: number
+          transaction_id?: string | null
+          unit_price: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          subtotal?: number
+          transaction_id?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_items_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_movements: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          movement_type: Database["public"]["Enums"]["movement_type"]
+          notes: string | null
+          product_id: string | null
+          quantity: number
+          reference_id: string | null
+          reference_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          movement_type: Database["public"]["Enums"]["movement_type"]
+          notes?: string | null
+          product_id?: string | null
+          quantity: number
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          movement_type?: Database["public"]["Enums"]["movement_type"]
+          notes?: string | null
+          product_id?: string | null
+          quantity?: number
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -265,10 +533,18 @@ export type Database = {
       }
     }
     Enums: {
+      movement_type: "purchase" | "sale" | "adjustment" | "return"
       payment_method: "cash" | "card" | "ewallet" | "transfer"
+      purchase_status: "pending" | "approved" | "rejected" | "completed"
       room_status: "available" | "occupied" | "maintenance" | "reserved"
       transaction_type: "room_rental" | "food_beverage" | "other"
-      user_role: "owner" | "manager" | "cashier"
+      user_role:
+        | "owner"
+        | "manager"
+        | "cashier"
+        | "waiter"
+        | "waitress"
+        | "accountant"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -396,10 +672,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      movement_type: ["purchase", "sale", "adjustment", "return"],
       payment_method: ["cash", "card", "ewallet", "transfer"],
+      purchase_status: ["pending", "approved", "rejected", "completed"],
       room_status: ["available", "occupied", "maintenance", "reserved"],
       transaction_type: ["room_rental", "food_beverage", "other"],
-      user_role: ["owner", "manager", "cashier"],
+      user_role: [
+        "owner",
+        "manager",
+        "cashier",
+        "waiter",
+        "waitress",
+        "accountant",
+      ],
     },
   },
 } as const
