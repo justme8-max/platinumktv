@@ -100,7 +100,7 @@ export default function RealtimeRevenueChart() {
             <div>
               <p className="text-sm text-muted-foreground">Omset Per Detik</p>
               <p className="text-2xl font-bold flex items-center gap-2">
-                Rp {revenuePerSecond.toFixed(0).toLocaleString('id-ID')}
+                Rp {Math.round(revenuePerSecond).toLocaleString('id-ID')}
                 <span className="text-sm text-muted-foreground">/detik</span>
               </p>
               <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">

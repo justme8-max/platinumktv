@@ -151,6 +151,8 @@ export default function OwnerDashboard() {
             <EmployeeList
               employees={employees}
               onEdit={handleEditEmployee}
+              onDelete={loadDashboardData}
+              canDelete={true}
             />
           </TabsContent>
         </Tabs>
