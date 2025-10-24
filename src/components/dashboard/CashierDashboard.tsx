@@ -7,7 +7,7 @@ import RoomCard from "./RoomCard";
 import RoomDetailDialog from "./RoomDetailDialog";
 import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, CreditCard, ShoppingCart } from "lucide-react";
+import { DollarSign, Clock, CreditCard, ShoppingCart, Info } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
@@ -113,7 +113,7 @@ export default function CashierDashboard() {
 
       if (error) throw error;
 
-      toast.success("Sesi ruangan dimulai");
+      toast.success(t('cashier_dashboard.room_session_started'));
       loadDashboardData();
     } catch (error: any) {
       toast.error(error.message);
@@ -160,7 +160,7 @@ export default function CashierDashboard() {
         })
         .eq("id", roomId);
 
-      toast.success(`Sesi selesai. Total: Rp ${amount.toLocaleString()}`);
+      toast.success(t('cashier_dashboard.session_ended', { amount: amount.toLocaleString() }));
       loadDashboardData();
       setDetailDialogOpen(false);
     } catch (error: any) {
@@ -172,23 +172,23 @@ export default function CashierDashboard() {
     <DashboardLayout role="cashier">
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold mb-2">Point of Sale</h2>
-          <p className="text-muted-foreground">Kelola pemesanan ruangan dan transaksi</p>
+          <h2 className="text-3xl font-bold mb-2">{t('cashier_dashboard.title')}</h2>
+          <p className="text-muted-foreground">{t('cashier_dashboard.description')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatsCard
-            title="Transaksi Hari Ini"
+            title={t('cashier_dashboard.today_transactions')}
             value={stats.todayTransactions}
             icon={CreditCard}
           />
           <StatsCard
-            title="Omset Hari Ini"
+            title={t('cashier_dashboard.today_revenue')}
             value={`Rp ${stats.todayRevenue.toLocaleString()}`}
             icon={DollarSign}
           />
           <StatsCard
-            title="Sesi Aktif"
+            title={t('cashier_dashboard.active_sessions')}
             value={stats.activeRooms}
             icon={Clock}
           />
@@ -196,10 +196,10 @@ export default function CashierDashboard() {
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold">Ruangan</h3>
+            <h3 className="text-xl font-semibold">{t('cashier_dashboard.rooms')}</h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Info className="h-4 w-4" />
-              <p>Klik ruangan untuk melihat detail & pesanan</p>
+              <p>{t('cashier_dashboard.room_click_hint')}</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -219,6 +219,18 @@ export default function CashierDashboard() {
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
         onUpdate={loadDashboardData}
+        onAddItems={() => handleAddItems(selectedRoom)}
+        onEndSession={() => endRoomSession(selectedRoom.id)}
+      />
+
+       <AddItemsToRoomDialog
+        room={selectedRoom}
+        open={addItemsOpen}
+        onOpenChange={setAddItemsOpen}
+        onUpdate={() => {
+          loadDashboardData();
+          setDetailDialogOpen(false);
+        }}
       />
     </DashboardLayout>
   );
