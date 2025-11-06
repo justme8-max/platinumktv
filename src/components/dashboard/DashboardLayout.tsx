@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogOut, Music } from "lucide-react";
 import dashboardBg from "@/assets/dashboard-background.svg";
+import employeeBg from "@/assets/employee-background.svg";
+import ownerBg from "@/assets/owner-background.svg";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -20,11 +22,18 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
     navigate("/login");
   };
 
+  // Select background based on role
+  const getBackgroundImage = () => {
+    if (role === 'owner') return ownerBg;
+    if (role === 'waiter' || role === 'cashier' || role === 'accountant' || role === 'manager') return employeeBg;
+    return dashboardBg;
+  };
+
   return (
     <div 
       className="min-h-screen bg-background"
       style={{
-        backgroundImage: `url(${dashboardBg})`,
+        backgroundImage: `url(${getBackgroundImage()})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
