@@ -72,6 +72,15 @@ export const en = {
     low_time_warning: "⚠️ Time is running out! Less than 15 minutes remaining.",
     booking_timeline: "Booking Timeline",
     extend_time: "Extend Time",
+    details_tab: "Details",
+    history_tab: "History",
+  },
+  booking_history: {
+    title: "Booking History",
+    total_bookings: "Total Bookings",
+    upcoming: "Upcoming Bookings",
+    past: "Past Bookings",
+    no_bookings: "No bookings found for this room",
   },
   timeline: {
     start: "Start",

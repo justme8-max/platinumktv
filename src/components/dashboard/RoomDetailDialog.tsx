@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, DollarSign, ShoppingCart, LogOut, Info, Timer, Plus, AlertTriangle } from "lucide-react";
+import { Clock, DollarSign, ShoppingCart, LogOut, Info, Timer, Plus, AlertTriangle, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useRoomTimer } from "@/hooks/useRoomTimer";
 import BookingTimeline from "./BookingTimeline";
 import ExtendTimeDialog from "./ExtendTimeDialog";
+import RoomBookingHistory from "./RoomBookingHistory";
 
 interface Room {
   id: string;
@@ -101,7 +103,7 @@ export default function RoomDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">
             {t('room_detail.title')} - {room.room_name}
@@ -118,7 +120,17 @@ export default function RoomDetailDialog({
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">{t('room_detail.details_tab')}</TabsTrigger>
+            <TabsTrigger value="history">
+              <History className="h-4 w-4 mr-2" />
+              {t('room_detail.history_tab')}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {/* Left Side: Room & Session Info */}
           <div className="space-y-6">
              <Card>
@@ -260,6 +272,12 @@ export default function RoomDetailDialog({
              {t('room_detail.end_session_and_pay')}
             </Button>
         </DialogFooter>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <RoomBookingHistory roomId={room.id} roomName={room.room_name} />
+          </TabsContent>
+        </Tabs>
 
         {/* Extend Time Dialog */}
         {booking && (

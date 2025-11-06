@@ -72,6 +72,15 @@ export const id = {
     low_time_warning: "⚠️ Waktu hampir habis! Kurang dari 15 menit tersisa.",
     booking_timeline: "Timeline Booking",
     extend_time: "Perpanjang Waktu",
+    details_tab: "Detail",
+    history_tab: "Riwayat",
+  },
+  booking_history: {
+    title: "Riwayat Booking",
+    total_bookings: "Total Booking",
+    upcoming: "Booking Mendatang",
+    past: "Booking Sebelumnya",
+    no_bookings: "Tidak ada booking untuk ruangan ini",
   },
   timeline: {
     start: "Mulai",
