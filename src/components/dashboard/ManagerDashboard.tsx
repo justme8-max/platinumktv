@@ -5,8 +5,9 @@ import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
+import ApprovalList from "@/components/manager/ApprovalList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, TrendingDown, Home, Plus, UserPlus } from "lucide-react";
+import { DollarSign, TrendingDown, Home, Plus, UserPlus, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EmployeeDialog from "@/components/employees/EmployeeDialog";
 import EmployeeList from "@/components/employees/EmployeeList";
@@ -128,12 +129,20 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        <Tabs defaultValue="rooms" className="space-y-6">
+        <Tabs defaultValue="approvals" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="approvals">
+              <CheckSquare className="h-4 w-4 mr-2" />
+              Persetujuan
+            </TabsTrigger>
             <TabsTrigger value="rooms">Room Status</TabsTrigger>
             <TabsTrigger value="employees">Karyawan</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="approvals" className="space-y-4">
+            <ApprovalList />
+          </TabsContent>
 
           <TabsContent value="rooms" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

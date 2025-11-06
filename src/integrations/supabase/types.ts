@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      approval_requests: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          percentage: number | null
+          reason: string
+          request_type: Database["public"]["Enums"]["approval_request_type"]
+          requested_by: string
+          room_id: string | null
+          status: Database["public"]["Enums"]["approval_status"]
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          percentage?: number | null
+          reason: string
+          request_type: Database["public"]["Enums"]["approval_request_type"]
+          requested_by: string
+          room_id?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          percentage?: number | null
+          reason?: string
+          request_type?: Database["public"]["Enums"]["approval_request_type"]
+          requested_by?: string
+          room_id?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_requests_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_requests_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booking_date: string
@@ -732,6 +795,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_approval_to_transaction: {
+        Args: { p_approval_id: string }
+        Returns: boolean
+      }
       calculate_transaction_total: {
         Args: {
           p_service_charge_rate?: number
@@ -770,6 +837,8 @@ export type Database = {
       }
     }
     Enums: {
+      approval_request_type: "discount" | "minimum_charge"
+      approval_status: "pending" | "approved" | "rejected"
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
       movement_type: "purchase" | "sale" | "adjustment" | "return"
       payment_method: "cash" | "card" | "ewallet" | "transfer"
@@ -910,6 +979,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      approval_request_type: ["discount", "minimum_charge"],
+      approval_status: ["pending", "approved", "rejected"],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
       movement_type: ["purchase", "sale", "adjustment", "return"],
       payment_method: ["cash", "card", "ewallet", "transfer"],

@@ -6,10 +6,11 @@ import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import RoomDetailDialog from "./RoomDetailDialog";
 import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
+import ApprovalRequestDialog from "@/components/cashier/ApprovalRequestDialog";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, CreditCard, ShoppingCart, Info } from "lucide-react";
+import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
@@ -25,6 +26,7 @@ export default function CashierDashboard() {
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [addItemsOpen, setAddItemsOpen] = useState(false);
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -207,9 +209,19 @@ export default function CashierDashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">{t('cashier_dashboard.rooms')}</h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Info className="h-4 w-4" />
-              <p>{t('cashier_dashboard.room_click_hint')}</p>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setApprovalDialogOpen(true)}
+              >
+                <PercentSquare className="h-4 w-4 mr-2" />
+                {t("approval.requestTitle")}
+              </Button>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="h-4 w-4" />
+                <p>{t('cashier_dashboard.room_click_hint')}</p>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -241,6 +253,12 @@ export default function CashierDashboard() {
           loadDashboardData();
           setDetailDialogOpen(false);
         }}
+      />
+
+      <ApprovalRequestDialog
+        open={approvalDialogOpen}
+        onOpenChange={setApprovalDialogOpen}
+        roomId={selectedRoom?.id}
       />
     </DashboardLayout>
   );
