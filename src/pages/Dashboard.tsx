@@ -10,13 +10,13 @@ import AccountantDashboard from "@/components/dashboard/AccountantDashboard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
-const dashboardComponents: { [key: string]: JSX.Element } = {
-  owner: <OwnerDashboard />,
-  manager: <ManagerDashboard />,
-  cashier: <CashierDashboard />,
-  waiter: <WaiterDashboard />,
-  waitress: <WaiterDashboard />,
-  accountant: <AccountantDashboard />,
+const dashboardComponents: { [key: string]: () => JSX.Element } = {
+  owner: OwnerDashboard,
+  manager: ManagerDashboard,
+  cashier: CashierDashboard,
+  waiter: WaiterDashboard,
+  waitress: WaiterDashboard,
+  accountant: AccountantDashboard,
 };
 
 export default function Dashboard() {
@@ -86,7 +86,7 @@ export default function Dashboard() {
   if (DashboardComponent) {
     return (
       <>
-        {DashboardComponent}
+        <DashboardComponent />
         {availableRoles.length > 1 && (
           <div className="fixed bottom-4 right-4 z-50">
             <div className="bg-card border border-border rounded-lg shadow-lg p-3">
