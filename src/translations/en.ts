@@ -46,6 +46,7 @@ export const en = {
     room: "Room",
     guests: "{count, plural, =1 {# guest} other {# guests}}",
     hour: "hr",
+    time_remaining: "Time Remaining",
   },
   room_detail: {
     title: "Room Detail",
@@ -53,6 +54,7 @@ export const en = {
     status: "Status",
     hourly_rate: "Hourly Rate",
     duration: "Duration",
+    time_remaining: "Time Remaining",
     estimated_room_cost: "Estimated Room Cost",
     total_estimation: "Total Estimation",
     room_cost: "Room Cost",

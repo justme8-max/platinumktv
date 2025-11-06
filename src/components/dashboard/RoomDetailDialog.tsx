@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, DollarSign, ShoppingCart, LogOut, Info } from "lucide-react";
+import { Clock, DollarSign, ShoppingCart, LogOut, Info, Timer } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRoomTimer } from "@/hooks/useRoomTimer";
 
 interface Room {
   id: string;
@@ -37,6 +38,7 @@ export default function RoomDetailDialog({
   const [estimatedCost, setEstimatedCost] = useState<number>(0);
   const [orderedItems, setOrderedItems] = useState<any[]>([]);
   const { t, language } = useLanguage();
+  const { timeRemaining } = useRoomTimer(room?.id || '', room?.status || '');
 
   const calculateDurationAndCost = () => {
     if (room?.current_session_start) {
@@ -129,6 +131,15 @@ export default function RoomDetailDialog({
                         {duration}
                       </p>
                     </div>
+                    {timeRemaining && (
+                      <div className="flex justify-between">
+                        <p className="text-muted-foreground">{t('room_detail.time_remaining')}</p>
+                        <p className="font-semibold flex items-center gap-1 text-orange-600">
+                          <Timer className="h-4 w-4" />
+                          {timeRemaining}
+                        </p>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <p className="text-muted-foreground">{t('room_detail.estimated_room_cost')}</p>
                       <p className="font-semibold flex items-center gap-1">

@@ -46,6 +46,7 @@ export const id = {
     room: "Kamar",
     guests: "{count} tamu",
     hour: "jam",
+    time_remaining: "Sisa Waktu",
   },
   room_detail: {
     title: "Detail Ruangan",
@@ -53,6 +54,7 @@ export const id = {
     status: "Status",
     hourly_rate: "Tarif/Jam",
     duration: "Durasi",
+    time_remaining: "Sisa Waktu",
     estimated_room_cost: "Estimasi Biaya Kamar",
     total_estimation: "Estimasi Total",
     room_cost: "Biaya Kamar",

@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users } from "lucide-react";
+import { Clock, Users, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatIDR } from "@/lib/currency";
+import { useRoomTimer } from "@/hooks/useRoomTimer";
 
 interface Room {
   id: string;
@@ -23,6 +24,7 @@ interface RoomCardProps {
 
 export default function RoomCard({ room, onClick }: RoomCardProps) {
   const { t } = useLanguage();
+  const { timeRemaining } = useRoomTimer(room.id, room.status);
 
   const statusConfig = {
     available: {
@@ -69,6 +71,13 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
             <span className="text-muted-foreground">•</span>
             <span className="capitalize">{room.room_type}</span>
           </div>
+          
+          {timeRemaining && (room.status === 'occupied' || room.status === 'reserved') && (
+            <div className="flex items-center gap-2 text-orange-600 font-semibold">
+              <Timer className="h-4 w-4" />
+              <span>{t('room_card.time_remaining')}: {timeRemaining}</span>
+            </div>
+          )}
           
            <div className="flex items-center justify-between pt-2 border-t">
             <div className="font-semibold text-primary">
