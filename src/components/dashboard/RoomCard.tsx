@@ -32,19 +32,24 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
 
   const statusConfig = {
     available: {
-      className: "bg-green-500 text-white",
+      className: "bg-success text-success-foreground",
+      cardBg: "bg-success/10 border-success/30",
     },
     occupied: {
-      className: "bg-red-500 text-white",
+      className: "bg-destructive text-destructive-foreground",
+      cardBg: "bg-destructive/10 border-destructive/30",
     },
     maintenance: {
-      className: "bg-orange-500 text-white",
+      className: "bg-warning text-warning-foreground",
+      cardBg: "bg-warning/10 border-warning/30",
     },
     reserved: {
-      className: "bg-blue-500 text-white",
+      className: "bg-[hsl(var(--gold))] text-[hsl(var(--gold-foreground))]",
+      cardBg: "bg-[hsl(var(--gold))]/10 border-[hsl(var(--gold))]/30",
     },
     cleaning: {
-      className: "bg-cyan-500 text-white",
+      className: "bg-[hsl(var(--platinum))] text-[hsl(var(--platinum-foreground))]",
+      cardBg: "bg-[hsl(var(--platinum))]/10 border-[hsl(var(--platinum))]/30",
     },
   };
   
@@ -61,11 +66,7 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
         className={cn(
           "cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1 relative",
           onClick && "hover:border-primary/50",
-          room.status === 'occupied' && 'bg-red-50/50 border-red-200',
-          room.status === 'available' && 'bg-green-50/50 border-green-200',
-          room.status === 'maintenance' && 'bg-orange-50/50 border-orange-200',
-          room.status === 'cleaning' && 'bg-cyan-50/50 border-cyan-200',
-          room.status === 'reserved' && 'bg-blue-50/50 border-blue-200',
+          statusInfo.cardBg
         )}
         onClick={onClick}
       >
@@ -99,7 +100,7 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
             </div>
             
             {room.status === 'available' && (
-              <div className="flex items-center gap-2 text-green-600 font-medium bg-green-100 px-3 py-2 rounded-md">
+              <div className="flex items-center gap-2 text-success-foreground font-medium bg-success/20 px-3 py-2 rounded-md">
                 <Clock className="h-4 w-4" />
                 <span>{t('room_card.click_to_start')}</span>
               </div>
@@ -108,7 +109,7 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
             {timeRemaining && (room.status === 'occupied' || room.status === 'reserved') && (
               <div className={cn(
                 "flex items-center gap-2 font-semibold",
-                isLowTime ? "text-red-600 animate-pulse" : "text-orange-600"
+                isLowTime ? "text-destructive animate-pulse" : "text-warning"
               )}>
                 <Timer className="h-4 w-4" />
                 <span>{t('room_card.time_remaining')}: {timeRemaining}</span>

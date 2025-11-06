@@ -17,6 +17,7 @@ const dashboardComponents: { [key: string]: () => JSX.Element } = {
   waiter: WaiterDashboard,
   waitress: WaiterDashboard,
   accountant: AccountantDashboard,
+  hrd: ManagerDashboard, // HRD uses manager dashboard
 };
 
 export default function Dashboard() {

@@ -241,6 +241,7 @@ export default function Register() {
                   <SelectItem value="cashier">Kasir</SelectItem>
                   <SelectItem value="waiter">Pelayan</SelectItem>
                   <SelectItem value="accountant">Akuntan</SelectItem>
+                  <SelectItem value="hrd">HRD</SelectItem>
                 </SelectContent>
               </Select>
             </div>
