@@ -31,7 +31,7 @@ export const en = {
     today_revenue: "Today's Revenue",
     active_sessions: "Active Sessions",
     rooms: "Rooms",
-    room_click_hint: "Click on a room to see details & orders",
+    room_click_hint: "💡 Green rooms: Click to start session | Red rooms: Click to see details",
     room_session_started: "Room session started",
     session_ended: "Session ended. Total: IDR {amount}",
   },
@@ -47,6 +47,7 @@ export const en = {
     guests: "{count, plural, =1 {# guest} other {# guests}}",
     hour: "hr",
     time_remaining: "Time Remaining",
+    click_to_start: "👆 Click to Start Session",
   },
   room_detail: {
     title: "Room Detail",

@@ -31,7 +31,7 @@ export const id = {
     today_revenue: "Omset Hari Ini",
     active_sessions: "Sesi Aktif",
     rooms: "Ruangan",
-    room_click_hint: "Klik ruangan untuk melihat detail & pesanan",
+    room_click_hint: "💡 Ruang hijau: Klik untuk mulai sesi | Ruang merah: Klik untuk lihat detail",
     room_session_started: "Sesi ruangan dimulai",
     session_ended: "Sesi selesai. Total: IDR {amount}",
   },
@@ -47,6 +47,7 @@ export const id = {
     guests: "{count} tamu",
     hour: "jam",
     time_remaining: "Sisa Waktu",
+    click_to_start: "👆 Klik untuk Mulai Sesi",
   },
   room_detail: {
     title: "Detail Ruangan",
