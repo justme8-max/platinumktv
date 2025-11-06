@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { DollarSign, Clock, CreditCard, ShoppingCart, Info } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
+import { formatIDR } from "@/lib/currency";
 
 export default function CashierDashboard() {
   const { t } = useLanguage();
@@ -186,7 +187,7 @@ export default function CashierDashboard() {
           />
           <StatsCard
             title={t('cashier_dashboard.today_revenue')}
-            value={`Rp ${stats.todayRevenue.toLocaleString()}`}
+            value={formatIDR(stats.todayRevenue)}
             icon={DollarSign}
           />
           <StatsCard

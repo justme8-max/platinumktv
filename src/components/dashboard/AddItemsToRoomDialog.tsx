@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Minus, ShoppingCart, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { formatIDR } from "@/lib/currency";
 
 interface AddItemsToRoomDialogProps {
   open: boolean;
@@ -122,7 +123,7 @@ export default function AddItemsToRoomDialog({ open, onOpenChange, room, onUpdat
                   <div className="flex justify-between items-center">
                     <div>
                       <h4 className="font-medium">{product[t('product_name_column')]}</h4>
-                      <p className="text-sm text-muted-foreground">Rp {product.price.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">{formatIDR(product.price)}</p>
                       <p className="text-xs text-muted-foreground">{t("add_items.stock")} {product.stock_quantity}</p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -159,10 +160,10 @@ export default function AddItemsToRoomDialog({ open, onOpenChange, room, onUpdat
                             <div>
                             <p className="font-medium">{product[t('product_name_column')]}</p>
                             <p className="text-sm text-muted-foreground">
-                                {quantity} x Rp {product.price.toLocaleString()}
+                                {quantity} x {formatIDR(product.price)}
                             </p>
                             </div>
-                            <p className="font-semibold">Rp {(product.price * quantity).toLocaleString()}</p>
+                            <p className="font-semibold">{formatIDR(product.price * quantity)}</p>
                         </div>
                         );
                     })
@@ -172,7 +173,7 @@ export default function AddItemsToRoomDialog({ open, onOpenChange, room, onUpdat
             <div className="border-t pt-4 mt-4">
                 <div className="flex justify-between items-center text-xl font-bold mb-4">
                 <span>{t("common.total")}</span>
-                <span>Rp {total.toLocaleString()}</span>
+                <span>{formatIDR(total)}</span>
                 </div>
             </div>
           </div>

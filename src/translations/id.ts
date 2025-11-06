@@ -28,7 +28,7 @@ export const id = {
     rooms: "Ruangan",
     room_click_hint: "Klik ruangan untuk melihat detail & pesanan",
     room_session_started: "Sesi ruangan dimulai",
-    session_ended: "Sesi selesai. Total: Rp {amount}",
+    session_ended: "Sesi selesai. Total: IDR {amount}",
   },
   room_status: {
     occupied: "Terisi",
@@ -58,6 +58,10 @@ export const id = {
     add_item: "Tambah Item",
     no_items: "Belum ada item yang dipesan.",
     end_session_and_pay: "Akhiri Sesi & Bayar",
+    subtotal: "Subtotal",
+    ppn: "PPN (11%)",
+    service_charge: "Service Charge",
+    final_total: "Total Akhir",
   },
   add_items: {
     title: "Tambah Pesanan",

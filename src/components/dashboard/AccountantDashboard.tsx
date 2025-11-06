@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, TrendingUp, Package, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import ExportButton from "@/components/common/ExportButton";
+import { formatIDR } from "@/lib/currency";
 
 export default function AccountantDashboard() {
   const { t } = useLanguage();
@@ -83,17 +84,17 @@ export default function AccountantDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <StatsCard
             title={t("Total Pendapatan", "Total Revenue")}
-            value={`Rp ${stats.revenue.toLocaleString()}`}
+            value={formatIDR(stats.revenue)}
             icon={DollarSign}
           />
           <StatsCard
             title={t("Total Pengeluaran", "Total Expenses")}
-            value={`Rp ${stats.expenses.toLocaleString()}`}
+            value={formatIDR(stats.expenses)}
             icon={TrendingUp}
           />
           <StatsCard
             title={t("Laba Bersih", "Net Profit")}
-            value={`Rp ${stats.netProfit.toLocaleString()}`}
+            value={formatIDR(stats.netProfit)}
             icon={DollarSign}
           />
           <StatsCard
@@ -135,7 +136,7 @@ export default function AccountantDashboard() {
                         {new Date(trans.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <p className="font-semibold">Rp {Number(trans.amount).toLocaleString()}</p>
+                    <p className="font-semibold">{formatIDR(trans.amount)}</p>
                   </div>
                 ))}
               </div>

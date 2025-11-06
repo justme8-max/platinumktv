@@ -17,6 +17,7 @@ import ProductDialog from "@/components/inventory/ProductDialog";
 import PurchaseOrderList from "@/components/purchase/PurchaseOrderList";
 import BestSellersChart from "@/components/analytics/BestSellersChart";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
+import { formatIDR } from "@/lib/currency";
 
 export default function OwnerDashboard() {
   const { t } = useLanguage();
@@ -197,7 +198,7 @@ export default function OwnerDashboard() {
               <h3 className="text-lg font-semibold text-muted-foreground">Omset Hari Ini</h3>
               <DollarSign className="h-8 w-8 text-primary" />
             </div>
-            <p className="text-5xl font-bold mb-3">Rp {stats.dailyRevenue.toLocaleString()}</p>
+            <p className="text-5xl font-bold mb-3">{formatIDR(stats.dailyRevenue)}</p>
             <div className="flex items-center gap-2">
               <TrendingUp className={`h-5 w-5 ${stats.dailyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`} />
               <span className={`text-sm font-medium ${stats.dailyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
@@ -211,7 +212,7 @@ export default function OwnerDashboard() {
               <h3 className="text-lg font-semibold text-muted-foreground">Omset Bulan Ini</h3>
               <DollarSign className="h-8 w-8 text-blue-500" />
             </div>
-            <p className="text-5xl font-bold mb-3">Rp {stats.monthlyRevenue.toLocaleString()}</p>
+            <p className="text-5xl font-bold mb-3">{formatIDR(stats.monthlyRevenue)}</p>
             <div className="flex items-center gap-2">
               <TrendingUp className={`h-5 w-5 ${stats.monthlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`} />
               <span className={`text-sm font-medium ${stats.monthlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
@@ -225,7 +226,7 @@ export default function OwnerDashboard() {
               <h3 className="text-lg font-semibold text-muted-foreground">Omset Tahun Ini</h3>
               <DollarSign className="h-8 w-8 text-purple-500" />
             </div>
-            <p className="text-5xl font-bold mb-3">Rp {stats.yearlyRevenue.toLocaleString()}</p>
+            <p className="text-5xl font-bold mb-3">{formatIDR(stats.yearlyRevenue)}</p>
             <div className="flex items-center gap-2">
               <TrendingUp className={`h-5 w-5 ${stats.yearlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`} />
               <span className={`text-sm font-medium ${stats.yearlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>

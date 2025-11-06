@@ -28,7 +28,7 @@ export const en = {
     rooms: "Rooms",
     room_click_hint: "Click on a room to see details & orders",
     room_session_started: "Room session started",
-    session_ended: "Session ended. Total: Rp {amount}",
+    session_ended: "Session ended. Total: IDR {amount}",
   },
   room_status: {
     occupied: "Occupied",
@@ -58,6 +58,10 @@ export const en = {
     add_item: "Add Item",
     no_items: "No items have been ordered yet.",
     end_session_and_pay: "End Session & Pay",
+    subtotal: "Subtotal",
+    ppn: "VAT (11%)",
+    service_charge: "Service Charge",
+    final_total: "Final Total",
   },
   add_items: {
     title: "Add Order",

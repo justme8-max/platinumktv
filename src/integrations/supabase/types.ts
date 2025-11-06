@@ -528,6 +528,39 @@ export type Database = {
           },
         ]
       }
+      tax_settings: {
+        Row: {
+          applies_to: string[] | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          rate: number
+          tax_type: string
+          updated_at: string
+        }
+        Insert: {
+          applies_to?: string[] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          rate?: number
+          tax_type?: string
+          updated_at?: string
+        }
+        Update: {
+          applies_to?: string[] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          rate?: number
+          tax_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -535,11 +568,16 @@ export type Database = {
           created_at: string | null
           description: string | null
           duration_hours: number | null
+          final_amount: number | null
           id: string
           payment_method: Database["public"]["Enums"]["payment_method"]
           room_id: string | null
+          service_charge: number | null
           session_end: string | null
           session_start: string | null
+          subtotal: number | null
+          tax_amount: number | null
+          tax_rate: number | null
           transaction_type: Database["public"]["Enums"]["transaction_type"]
         }
         Insert: {
@@ -548,11 +586,16 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           duration_hours?: number | null
+          final_amount?: number | null
           id?: string
           payment_method: Database["public"]["Enums"]["payment_method"]
           room_id?: string | null
+          service_charge?: number | null
           session_end?: string | null
           session_start?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
           transaction_type: Database["public"]["Enums"]["transaction_type"]
         }
         Update: {
@@ -561,11 +604,16 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           duration_hours?: number | null
+          final_amount?: number | null
           id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"]
           room_id?: string | null
+          service_charge?: number | null
           session_end?: string | null
           session_start?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
           transaction_type?: Database["public"]["Enums"]["transaction_type"]
         }
         Relationships: [
@@ -619,6 +667,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_transaction_total: {
+        Args: {
+          p_service_charge_rate?: number
+          p_subtotal: number
+          p_tax_rate?: number
+        }
+        Returns: {
+          final_amount: number
+          service_charge: number
+          subtotal: number
+          tax_amount: number
+        }[]
+      }
       can_use_all_mention: { Args: { _user_id: string }; Returns: boolean }
       generate_employee_id: {
         Args: { emp_division: string; emp_name: string }

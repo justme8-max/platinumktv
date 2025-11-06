@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatIDR } from "@/lib/currency";
 
 interface Room {
   id: string;
@@ -71,7 +72,7 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
           
            <div className="flex items-center justify-between pt-2 border-t">
             <div className="font-semibold text-primary">
-              Rp {room.hourly_rate.toLocaleString()}/{t('room_card.hour')}
+              {formatIDR(room.hourly_rate)}/{t('room_card.hour')}
             </div>
           </div>
         </div>
