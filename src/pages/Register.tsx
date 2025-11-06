@@ -49,7 +49,7 @@ export default function Register() {
         confirmPassword, 
         fullName, 
         phone,
-        division
+        division: division || undefined // Convert empty string to undefined
       });
       
       if (!validation.success) {
