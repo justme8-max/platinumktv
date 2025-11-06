@@ -115,7 +115,7 @@ export default function Register() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="w-full max-w-md relative z-10 space-y-6 bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
+      <div className="w-full max-w-md relative z-10 space-y-6 bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl animate-fade-in">
         <Link 
           to="/login" 
           className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-2"

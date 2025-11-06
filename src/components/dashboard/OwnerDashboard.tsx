@@ -12,6 +12,7 @@ import { DollarSign, TrendingUp, Users, Building2, UserPlus, Package, ShoppingCa
 import EmployeeDialog from "@/components/employees/EmployeeDialog";
 import EmployeeList from "@/components/employees/EmployeeList";
 import RealtimeRevenueChart from "./RealtimeRevenueChart";
+import OwnerRevenueChart from "./OwnerRevenueChart";
 import ProductList from "@/components/inventory/ProductList";
 import ProductDialog from "@/components/inventory/ProductDialog";
 import PurchaseOrderList from "@/components/purchase/PurchaseOrderList";
@@ -273,6 +274,7 @@ export default function OwnerDashboard() {
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-4">
+            <OwnerRevenueChart />
             <RealtimeRevenueChart />
           </TabsContent>
 
