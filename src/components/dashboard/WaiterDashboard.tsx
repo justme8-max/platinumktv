@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import RoomCard from "./RoomCard";
+import QuickActions from "./QuickActions";
+import RoleSpecificWidget from "./RoleSpecificWidget";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -53,23 +55,33 @@ export default function WaiterDashboard() {
             <p className="text-muted-foreground">{t("Kelola pesanan ruangan", "Manage room orders")}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {rooms.map((room) => (
-              <div key={room.id} onClick={() => handleRoomClick(room)} className="cursor-pointer">
-                <RoomCard room={room} />
-                <Button className="w-full mt-2" variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t("Tambah Pesanan", "Add Order")}
-                </Button>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <QuickActions role="waiter" />
+            <div className="lg:col-span-2">
+              <RoleSpecificWidget role="waiter" />
+            </div>
           </div>
 
-          {rooms.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              {t("Tidak ada ruangan yang terisi saat ini", "No occupied rooms at the moment")}
+          <div>
+            <h3 className="text-xl font-semibold mb-4">{t("Ruangan Terisi", "Occupied Rooms")}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {rooms.map((room) => (
+                <div key={room.id} onClick={() => handleRoomClick(room)} className="cursor-pointer">
+                  <RoomCard room={room} />
+                  <Button className="w-full mt-2" variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t("Tambah Pesanan", "Add Order")}
+                  </Button>
+                </div>
+              ))}
             </div>
-          )}
+
+            {rooms.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                {t("Tidak ada ruangan yang terisi saat ini", "No occupied rooms at the moment")}
+              </div>
+            )}
+          </div>
         </div>
       </DashboardLayout>
 

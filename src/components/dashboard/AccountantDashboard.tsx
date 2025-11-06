@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
+import QuickActions from "./QuickActions";
+import RoleSpecificWidget from "./RoleSpecificWidget";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, TrendingUp, Package, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -99,6 +101,13 @@ export default function AccountantDashboard() {
             value={stats.lowStockItems}
             icon={AlertTriangle}
           />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <QuickActions role="accountant" />
+          <div className="lg:col-span-2">
+            <RoleSpecificWidget role="accountant" />
+          </div>
         </div>
 
         <Tabs defaultValue="transactions" className="space-y-4">

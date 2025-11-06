@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
+import QuickActions from "./QuickActions";
+import RoleSpecificWidget from "./RoleSpecificWidget";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, TrendingDown, Home, Plus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -114,6 +116,16 @@ export default function ManagerDashboard() {
             value={stats.occupiedRooms}
             icon={Home}
           />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <QuickActions role="manager" actions={[
+            { icon: UserPlus, label: "Tambah Karyawan", onClick: () => setDialogOpen(true), variant: "default" },
+            { icon: Plus, label: "Tambah Expense", onClick: () => {}, variant: "default" },
+          ]} />
+          <div className="lg:col-span-2">
+            <RoleSpecificWidget role="manager" />
+          </div>
         </div>
 
         <Tabs defaultValue="rooms" className="space-y-6">

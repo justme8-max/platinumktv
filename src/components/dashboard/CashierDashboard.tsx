@@ -6,6 +6,8 @@ import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import RoomDetailDialog from "./RoomDetailDialog";
 import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
+import QuickActions from "./QuickActions";
+import RoleSpecificWidget from "./RoleSpecificWidget";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Clock, CreditCard, ShoppingCart, Info } from "lucide-react";
 import { toast } from "sonner";
@@ -192,6 +194,13 @@ export default function CashierDashboard() {
             value={stats.activeRooms}
             icon={Clock}
           />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <QuickActions role="cashier" />
+          <div className="lg:col-span-2">
+            <RoleSpecificWidget role="cashier" />
+          </div>
         </div>
 
         <div>
