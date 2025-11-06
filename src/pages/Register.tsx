@@ -42,23 +42,15 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Check if role is required (not required for bitbuddy99@gmail.com)
-      const isSpecialAccount = email === "bitbuddy99@gmail.com";
-      
-      // Validate input with zod - make division optional for special account
-      const validationData: any = { 
+      // Validate input with zod - division is required for all except bitbuddy99@gmail.com
+      const validation = registerSchema.safeParse({ 
         email, 
         password, 
         confirmPassword, 
         fullName, 
-        phone
-      };
-      
-      if (!isSpecialAccount) {
-        validationData.division = division;
-      }
-      
-      const validation = registerSchema.safeParse(validationData);
+        phone,
+        division
+      });
       
       if (!validation.success) {
         const firstError = validation.error.issues[0];
