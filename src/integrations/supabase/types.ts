@@ -77,6 +77,38 @@ export type Database = {
           },
         ]
       }
+      booking_reminders: {
+        Row: {
+          booking_id: string
+          email_error: string | null
+          email_sent: boolean | null
+          id: string
+          sent_at: string | null
+        }
+        Insert: {
+          booking_id: string
+          email_error?: string | null
+          email_sent?: boolean | null
+          id?: string
+          sent_at?: string | null
+        }
+        Update: {
+          booking_id?: string
+          email_error?: string | null
+          email_sent?: boolean | null
+          id?: string
+          sent_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_reminders_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booking_date: string
@@ -525,6 +557,83 @@ export type Database = {
         }
         Relationships: []
       }
+      recurring_bookings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          day_of_month: number | null
+          day_of_week: number | null
+          deposit_amount: number | null
+          duration_hours: number
+          end_date: string | null
+          end_time: string
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          hourly_rate: number
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          room_id: string
+          start_date: string
+          start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          day_of_month?: number | null
+          day_of_week?: number | null
+          deposit_amount?: number | null
+          duration_hours: number
+          end_date?: string | null
+          end_time: string
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          hourly_rate: number
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          room_id: string
+          start_date: string
+          start_time: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          day_of_month?: number | null
+          day_of_week?: number | null
+          deposit_amount?: number | null
+          duration_hours?: number
+          end_date?: string | null
+          end_time?: string
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          hourly_rate?: number
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          room_id?: string
+          start_date?: string
+          start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_bookings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           capacity: number
@@ -843,6 +952,7 @@ export type Database = {
       movement_type: "purchase" | "sale" | "adjustment" | "return"
       payment_method: "cash" | "card" | "ewallet" | "transfer"
       purchase_status: "pending" | "approved" | "rejected" | "completed"
+      recurring_frequency: "weekly" | "monthly"
       room_status: "available" | "occupied" | "maintenance" | "reserved"
       transaction_type: "room_rental" | "food_beverage" | "other"
       user_role:
@@ -985,6 +1095,7 @@ export const Constants = {
       movement_type: ["purchase", "sale", "adjustment", "return"],
       payment_method: ["cash", "card", "ewallet", "transfer"],
       purchase_status: ["pending", "approved", "rejected", "completed"],
+      recurring_frequency: ["weekly", "monthly"],
       room_status: ["available", "occupied", "maintenance", "reserved"],
       transaction_type: ["room_rental", "food_beverage", "other"],
       user_role: [
