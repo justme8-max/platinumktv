@@ -34,6 +34,23 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Password minimal 6 karakter").max(100, "Password maksimal 100 karakter"),
 });
 
+// Registration validation schema
+export const registerSchema = z.object({
+  email: z.string().trim().email("Format email tidak valid").max(255, "Email maksimal 255 karakter"),
+  password: z.string()
+    .min(8, "Password minimal 8 karakter")
+    .max(100, "Password maksimal 100 karakter")
+    .regex(/[A-Z]/, "Password harus memiliki minimal 1 huruf kapital")
+    .regex(/[a-z]/, "Password harus memiliki minimal 1 huruf kecil")
+    .regex(/[0-9]/, "Password harus memiliki minimal 1 angka"),
+  confirmPassword: z.string(),
+  fullName: z.string().trim().min(2, "Nama lengkap minimal 2 karakter").max(100, "Nama maksimal 100 karakter"),
+  phone: z.string().trim().regex(/^(\+?62|0)[0-9]{9,13}$/, "Format nomor telepon tidak valid").optional().or(z.literal("")),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Password tidak cocok",
+  path: ["confirmPassword"],
+});
+
 // Transaction validation schema
 export const transactionSchema = z.object({
   room_id: z.string().uuid("Ruangan tidak valid"),

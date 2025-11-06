@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,9 +103,18 @@ export default function Login() {
             className="w-full h-12 bg-white/95 text-foreground hover:bg-white rounded-xl font-medium shadow-sm transition-all"
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Masuk..." : "Masuk"}
           </Button>
         </form>
+
+        <div className="text-center">
+          <p className="text-white/80 text-sm">
+            Belum punya akun?{" "}
+            <Link to="/register" className="text-white font-semibold hover:underline">
+              Daftar di sini
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
