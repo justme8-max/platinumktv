@@ -13,7 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Music, Loader2, ArrowLeft } from "lucide-react";
-import registerBg from "@/assets/register-background.svg";
+import registerBg from "@/assets/register-background-new.svg";
 import { registerSchema } from "@/lib/validation";
 
 export default function Register() {
