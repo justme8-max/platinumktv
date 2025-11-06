@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,6 +17,28 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 export default function DemoDataManager() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [hasManagementAccess, setHasManagementAccess] = useState(false);
+
+  useEffect(() => {
+    checkManagementAccess();
+  }, []);
+
+  const checkManagementAccess = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .in("role", ["owner", "manager"]);
+
+    setHasManagementAccess(data && data.length > 0);
+  };
+
+  if (!hasManagementAccess) {
+    return null; // Hide for non-management users
+  }
 
   const seedDemoData = async () => {
     setLoading(true);
