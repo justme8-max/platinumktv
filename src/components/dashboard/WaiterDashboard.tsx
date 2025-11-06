@@ -35,7 +35,6 @@ export default function WaiterDashboard() {
     const { data } = await supabase
       .from("rooms")
       .select("*")
-      .eq("status", "occupied")
       .order("room_number");
 
     setRooms(data || []);
@@ -63,22 +62,30 @@ export default function WaiterDashboard() {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-4">{t("Ruangan Terisi", "Occupied Rooms")}</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              {t("Ruangan", "Rooms")}
+              {rooms.length === 0 && (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  (Kosong - Gunakan "Demo Data" untuk mengisi)
+                </span>
+              )}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {rooms.map((room) => (
-                <div key={room.id} onClick={() => handleRoomClick(room)} className="cursor-pointer">
-                  <RoomCard room={room} />
-                  <Button className="w-full mt-2" variant="outline">
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t("Tambah Pesanan", "Add Order")}
-                  </Button>
-                </div>
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onClick={() => handleRoomClick(room)}
+                />
               ))}
             </div>
 
             {rooms.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                {t("Tidak ada ruangan yang terisi saat ini", "No occupied rooms at the moment")}
+              <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
+                <p className="text-lg font-medium mb-2">Tidak ada data ruangan</p>
+                <p className="text-sm text-muted-foreground">
+                  Login sebagai Owner/Manager → Klik "Demo Data" → Seed Demo Data
+                </p>
               </div>
             )}
           </div>
