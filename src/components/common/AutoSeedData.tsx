@@ -15,6 +15,22 @@ export default function AutoSeedData() {
       const seeded = localStorage.getItem('data_seeded');
       if (seeded) return;
 
+      // Check if user has management access
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .in("role", ["owner", "manager"]);
+
+      // Only owner/manager can auto-seed due to RLS policies
+      if (!roles || roles.length === 0) {
+        localStorage.setItem('data_seeded', 'true');
+        return;
+      }
+
       // Check if rooms exist
       const { data: rooms, error } = await supabase
         .from("rooms")
@@ -39,6 +55,7 @@ export default function AutoSeedData() {
       setTimeout(() => window.location.reload(), 2000);
     } catch (error: any) {
       console.error("Auto-seed error:", error);
+      localStorage.setItem('data_seeded', 'true');
     } finally {
       setIsSeeding(false);
     }

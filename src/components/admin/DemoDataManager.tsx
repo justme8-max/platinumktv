@@ -31,7 +31,7 @@ export default function DemoDataManager() {
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .in("role", ["owner", "manager", "cashier"]);
+      .in("role", ["owner", "manager"]);
 
     setHasManagementAccess(data && data.length > 0);
   };
