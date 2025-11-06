@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import PWAInstallPrompt from "@/components/common/PWAInstallPrompt";
 import FloatingChatButton from "@/components/chat/FloatingChatButton";
+import AutoSeedData from "@/components/common/AutoSeedData";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -52,6 +53,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <PWAInstallPrompt />
+        <AutoSeedData />
         <BrowserRouter>
           <AuthStateListener />
           <Routes>
