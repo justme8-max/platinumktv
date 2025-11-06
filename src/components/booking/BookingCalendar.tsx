@@ -67,10 +67,10 @@ export default function BookingCalendar({ onEditBooking }: BookingCalendarProps)
     };
 
     const labels: Record<string, string> = {
-      pending: t.bookings.statusPending,
-      confirmed: t.bookings.statusConfirmed,
-      cancelled: t.bookings.statusCancelled,
-      completed: t.bookings.statusCompleted,
+      pending: t("bookings.statusPending"),
+      confirmed: t("bookings.statusConfirmed"),
+      cancelled: t("bookings.statusCancelled"),
+      completed: t("bookings.statusCompleted"),
     };
 
     return (
@@ -89,7 +89,7 @@ export default function BookingCalendar({ onEditBooking }: BookingCalendarProps)
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-1">
         <CardHeader>
-          <CardTitle>{t.bookings.selectDate}</CardTitle>
+          <CardTitle>{t("bookings.selectDate")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Calendar
@@ -113,13 +113,13 @@ export default function BookingCalendar({ onEditBooking }: BookingCalendarProps)
       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>
-            {t.bookings.bookingsFor} {format(selectedDate, "dd MMMM yyyy")}
+            {t("bookings.bookingsFor")} {format(selectedDate, "dd MMMM yyyy")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {!bookings || bookings.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              {t.bookings.noBookingsForDate}
+              {t("bookings.noBookingsForDate")}
             </div>
           ) : (
             <div className="space-y-4">
@@ -177,7 +177,7 @@ export default function BookingCalendar({ onEditBooking }: BookingCalendarProps)
                         <div>
                           {booking.deposit_amount > 0 && (
                             <p className="text-xs text-muted-foreground">
-                              {t.bookings.deposit}: {formatIDR(booking.deposit_amount)}
+                              {t("bookings.deposit")}: {formatIDR(booking.deposit_amount)}
                             </p>
                           )}
                         </div>
