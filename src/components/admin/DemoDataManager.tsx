@@ -55,7 +55,38 @@ export default function DemoDataManager() {
 
       if (!rooms) throw new Error("Failed to create rooms");
 
-      // 3. Create products
+      // 3. Create employees (25 Platinum KTV employees)
+      const employees = [
+        { name: "RINI KURNIAWATI", division: "MANAGER", phone: "81376769907", employee_id: "RK-11/7-MAN" },
+        { name: "RISKA ANDRIANI", division: "ACCOUNTING", phone: "81260296823", employee_id: "RA-12/10-ACC" },
+        { name: "JEFRY ANDRIZAL", division: "KAPTEN", phone: "81376871996", employee_id: "JA-12/6-KAP" },
+        { name: "M.RINALDI SAHPUTRA", division: "KAPTEN", phone: "", employee_id: "MRS-15/6-KAP" },
+        { name: "DELIMA OKTAVIANI HUTAJULU", division: "KASIR", phone: "85362910175", employee_id: "DOH-19/5-KAS" },
+        { name: "DESI HANDAYANI", division: "KASIR", phone: "85262582338", employee_id: "DH-12/5-KAS" },
+        { name: "EDWINSYAH", division: "WAITERS", phone: "85194409449", employee_id: "E-9/7-WAI" },
+        { name: "AKHMAD SYAFII LUBIS", division: "WAITERS", phone: "85373642815", employee_id: "ASL-15/7-WAI" },
+        { name: "ZULFIKAR", division: "WAITERS", phone: "89636561419", employee_id: "Z-7/7-WAI" },
+        { name: "VANNY FEBRIANA", division: "WAITERS", phone: "82163575027", employee_id: "VF-12/7-WAI" },
+        { name: "KAI RAHMAT", division: "OB", phone: "83853283373", employee_id: "KR-8/2-OBJ" },
+        { name: "SYAHFRIL", division: "OB", phone: "82376603434", employee_id: "S-7/2-OBJ" },
+        { name: "MUHAMMAD CHANDRA", division: "OB", phone: "83171612596", employee_id: "MC-13/2-OBJ" },
+        { name: "ERIK WIJAYA", division: "DJ", phone: "", employee_id: "EW-9/2-DJJ" },
+        { name: "ANDY EFENDY", division: "DJ", phone: "85371373672", employee_id: "AE-9/2-DJJ" },
+        { name: "M.ILHAM AZIZI", division: "DJ", phone: "81362214465", employee_id: "MIA-10/2-DJJ" },
+        { name: "BARA", division: "DJ", phone: "82164560426", employee_id: "B-4/2-DJJ" },
+        { name: "ADE SURYA MUCHTAR", division: "SECURTY", phone: "82160703883", employee_id: "ASM-13/7-SEC" },
+        { name: "FAUZI HERIADI", division: "SECURTY", phone: "82286931868", employee_id: "FH-11/7-SEC" },
+        { name: "GALIH", division: "SECURTY", phone: "97821136267", employee_id: "G-5/7-SEC" },
+        { name: "MUHAMMAD YUDI", division: "SECURTY", phone: "85765037212", employee_id: "MY-11/7-SEC" },
+        { name: "M.MUCHTARDI", division: "SOUNDMEN", phone: "83165789177", employee_id: "MM-10/8-SOU" },
+        { name: "ISWANTO", division: "SOUNDMEN", phone: "83197681356", employee_id: "I-7/8-SOU" },
+        { name: "LUTHFI ROZIQIN", division: "BAR", phone: "81263497433", employee_id: "LR-11/3-BAR" },
+        { name: "DEDI HARYONO", division: "BAR", phone: "81265831033", employee_id: "DH-10/3-BAR" },
+      ];
+
+      await supabase.from("employees").insert(employees);
+
+      // 4. Create products
       const products = [
         { sku: "BEV001", name_id: "Coca Cola", name_en: "Coca Cola", category_id: categories[0].id, price: 25000, cost: 15000, stock_quantity: 100, min_stock_level: 20 },
         { sku: "BEV002", name_id: "Sprite", name_en: "Sprite", category_id: categories[0].id, price: 25000, cost: 15000, stock_quantity: 100, min_stock_level: 20 },
@@ -67,7 +98,7 @@ export default function DemoDataManager() {
 
       await supabase.from("products").insert(products);
 
-      // 4. Create a booking for tomorrow
+      // 5. Create a booking for tomorrow
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       
@@ -88,7 +119,7 @@ export default function DemoDataManager() {
         },
       ]);
 
-      // 5. Create some past transactions
+      // 6. Create some past transactions
       const { data: { user } } = await supabase.auth.getUser();
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -120,7 +151,7 @@ export default function DemoDataManager() {
         },
       ]);
 
-      toast.success("Demo data seeded successfully! 11 rooms created (4 in maintenance)");
+      toast.success("Demo data seeded! 11 rooms (4 in maintenance) & 25 employees created");
       setOpen(false);
     } catch (error: any) {
       toast.error(`Failed to seed data: ${error.message}`);
@@ -183,6 +214,7 @@ export default function DemoDataManager() {
             <strong>Seed Demo Data includes:</strong>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>11 KTV Rooms (7 available, 4 in maintenance)</li>
+              <li>25 Platinum KTV Employees (all divisions)</li>
               <li>3 Product Categories</li>
               <li>6 Products (drinks, food, packages)</li>
               <li>1 Upcoming Booking</li>
