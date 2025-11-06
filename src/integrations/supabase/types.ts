@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          booking_date: string
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          deposit_amount: number | null
+          duration_hours: number
+          end_time: string
+          id: string
+          notes: string | null
+          room_id: string
+          start_time: string
+          status: Database["public"]["Enums"]["booking_status"]
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          booking_date: string
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          deposit_amount?: number | null
+          duration_hours: number
+          end_time: string
+          id?: string
+          notes?: string | null
+          room_id: string
+          start_time: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          booking_date?: string
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          deposit_amount?: number | null
+          duration_hours?: number
+          end_time?: string
+          id?: string
+          notes?: string | null
+          room_id?: string
+          start_time?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -681,6 +746,16 @@ export type Database = {
         }[]
       }
       can_use_all_mention: { Args: { _user_id: string }; Returns: boolean }
+      check_room_availability: {
+        Args: {
+          p_booking_date: string
+          p_end_time: string
+          p_exclude_booking_id?: string
+          p_room_id: string
+          p_start_time: string
+        }
+        Returns: boolean
+      }
       generate_employee_id: {
         Args: { emp_division: string; emp_name: string }
         Returns: string
@@ -695,6 +770,7 @@ export type Database = {
       }
     }
     Enums: {
+      booking_status: "pending" | "confirmed" | "cancelled" | "completed"
       movement_type: "purchase" | "sale" | "adjustment" | "return"
       payment_method: "cash" | "card" | "ewallet" | "transfer"
       purchase_status: "pending" | "approved" | "rejected" | "completed"
@@ -834,6 +910,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      booking_status: ["pending", "confirmed", "cancelled", "completed"],
       movement_type: ["purchase", "sale", "adjustment", "return"],
       payment_method: ["cash", "card", "ewallet", "transfer"],
       purchase_status: ["pending", "approved", "rejected", "completed"],

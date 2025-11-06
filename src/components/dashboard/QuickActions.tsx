@@ -10,9 +10,11 @@ import {
   Package,
   Clock,
   UserPlus,
-  Calculator
+  Calculator,
+  CalendarCheck
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 interface QuickAction {
   icon: any;
@@ -28,36 +30,38 @@ interface QuickActionsProps {
 
 export default function QuickActions({ role, actions }: QuickActionsProps) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const defaultActions: Record<string, QuickAction[]> = {
     waiter: [
       { icon: ShoppingCart, label: t("Tambah Pesanan", "Add Order"), onClick: () => {}, variant: "default" },
+      { icon: CalendarCheck, label: t("Booking", "Bookings"), onClick: () => navigate("/bookings"), variant: "default" },
       { icon: Clock, label: t("Ruangan Aktif", "Active Rooms"), onClick: () => {}, variant: "outline" },
       { icon: FileText, label: t("Riwayat", "History"), onClick: () => {}, variant: "outline" },
     ],
     cashier: [
       { icon: Plus, label: t("Mulai Sesi", "Start Session"), onClick: () => {}, variant: "default" },
-      { icon: DollarSign, label: t("Bayar", "Payment"), onClick: () => {}, variant: "default" },
+      { icon: CalendarCheck, label: t("Booking", "Bookings"), onClick: () => navigate("/bookings"), variant: "default" },
+      { icon: DollarSign, label: t("Bayar", "Payment"), onClick: () => {}, variant: "outline" },
       { icon: ShoppingCart, label: t("Pesanan", "Orders"), onClick: () => {}, variant: "outline" },
-      { icon: FileText, label: t("Laporan", "Report"), onClick: () => {}, variant: "outline" },
     ],
     manager: [
       { icon: UserPlus, label: t("Tambah Karyawan", "Add Employee"), onClick: () => {}, variant: "default" },
-      { icon: Package, label: t("Kelola Stok", "Manage Stock"), onClick: () => {}, variant: "default" },
+      { icon: CalendarCheck, label: t("Booking", "Bookings"), onClick: () => navigate("/bookings"), variant: "default" },
+      { icon: Package, label: t("Kelola Stok", "Manage Stock"), onClick: () => {}, variant: "outline" },
       { icon: TrendingUp, label: t("Analitik", "Analytics"), onClick: () => {}, variant: "outline" },
-      { icon: FileText, label: t("Laporan", "Reports"), onClick: () => {}, variant: "outline" },
     ],
     owner: [
       { icon: TrendingUp, label: t("Analitik", "Analytics"), onClick: () => {}, variant: "default" },
-      { icon: DollarSign, label: t("Keuangan", "Finance"), onClick: () => {}, variant: "default" },
+      { icon: CalendarCheck, label: t("Booking", "Bookings"), onClick: () => navigate("/bookings"), variant: "default" },
+      { icon: DollarSign, label: t("Keuangan", "Finance"), onClick: () => {}, variant: "outline" },
       { icon: Users, label: t("Manajemen Tim", "Team Management"), onClick: () => {}, variant: "outline" },
-      { icon: FileText, label: t("Laporan Lengkap", "Full Report"), onClick: () => {}, variant: "outline" },
     ],
     accountant: [
       { icon: Calculator, label: t("Buat Laporan", "Create Report"), onClick: () => {}, variant: "default" },
-      { icon: DollarSign, label: t("Transaksi", "Transactions"), onClick: () => {}, variant: "default" },
+      { icon: CalendarCheck, label: t("Booking", "Bookings"), onClick: () => navigate("/bookings"), variant: "default" },
+      { icon: DollarSign, label: t("Transaksi", "Transactions"), onClick: () => {}, variant: "outline" },
       { icon: TrendingUp, label: t("Pengeluaran", "Expenses"), onClick: () => {}, variant: "outline" },
-      { icon: FileText, label: t("Rekap", "Summary"), onClick: () => {}, variant: "outline" },
     ],
   };
 
