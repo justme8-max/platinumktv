@@ -9,6 +9,8 @@ import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
 import ApprovalRequestDialog from "@/components/cashier/ApprovalRequestDialog";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
+import UpcomingBookingsWidget from "./UpcomingBookingsWidget";
+import PaymentDialog from "./PaymentDialog";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare } from "lucide-react";
 import { toast } from "sonner";
@@ -28,6 +30,7 @@ export default function CashierDashboard() {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [addItemsOpen, setAddItemsOpen] = useState(false);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -147,51 +150,8 @@ export default function CashierDashboard() {
   };
 
   const endRoomSession = async (roomId: string) => {
-    try {
-      const { data: room } = await supabase
-        .from("rooms")
-        .select("*")
-        .eq("id", roomId)
-        .single();
-
-      if (!room) return;
-
-      // Calculate duration and amount
-      const start = new Date(room.current_session_start);
-      const end = new Date();
-      const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-      const amount = Math.ceil(hours) * room.hourly_rate;
-
-      // Create transaction
-      const { data: { user } } = await supabase.auth.getUser();
-
-      await supabase.from("transactions").insert({
-        room_id: roomId,
-        cashier_id: user?.id,
-        transaction_type: "room_rental",
-        amount,
-        payment_method: "cash",
-        session_start: room.current_session_start,
-        session_end: end.toISOString(),
-        duration_hours: Math.ceil(hours),
-        description: `${room.room_name} - ${Math.ceil(hours)} hours`,
-      });
-
-      // Update room status
-      await supabase
-        .from("rooms")
-        .update({
-          status: "available",
-          current_session_start: null,
-        })
-        .eq("id", roomId);
-
-      toast.success(t('cashier_dashboard.session_ended', { amount: amount.toLocaleString() }));
-      loadDashboardData();
-      setDetailDialogOpen(false);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+    // Open payment dialog instead of directly ending session
+    setPaymentDialogOpen(true);
   };
 
   return (
@@ -223,8 +183,12 @@ export default function CashierDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <QuickActions role="cashier" />
           <div className="lg:col-span-2">
-            <RoleSpecificWidget role="cashier" />
+            <UpcomingBookingsWidget />
           </div>
+        </div>
+
+        <div>
+          <RoleSpecificWidget role="cashier" />
         </div>
 
         <div>
@@ -281,6 +245,16 @@ export default function CashierDashboard() {
         open={approvalDialogOpen}
         onOpenChange={setApprovalDialogOpen}
         roomId={selectedRoom?.id}
+      />
+
+      <PaymentDialog
+        room={selectedRoom}
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        onSuccess={() => {
+          loadDashboardData();
+          setDetailDialogOpen(false);
+        }}
       />
     </DashboardLayout>
   );
