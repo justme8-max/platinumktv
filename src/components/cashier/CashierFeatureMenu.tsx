@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -20,24 +21,51 @@ import {
   CreditCard
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import SplitBillDialog from "./SplitBillDialog";
+import ReceiptPreviewDialog from "./ReceiptPreviewDialog";
 
 interface CashierFeatureMenuProps {
   roomId: string;
   roomName: string;
+  totalAmount: number;
   onAddItems: () => void;
   onProcessPayment: () => void;
   onRequestDiscount: () => void;
-  onViewReceipt: () => void;
+  onExtendTime: () => void;
 }
 
 export default function CashierFeatureMenu({
   roomId,
   roomName,
+  totalAmount,
   onAddItems,
   onProcessPayment,
   onRequestDiscount,
-  onViewReceipt,
+  onExtendTime,
 }: CashierFeatureMenuProps) {
+  const [splitBillOpen, setSplitBillOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+
+  const dummyReceiptData = {
+    roomName,
+    roomNumber: "101",
+    receiptNumber: `RCP-${Date.now()}`,
+    date: new Date().toLocaleString(),
+    cashier: "Kasir Demo",
+    items: [],
+    roomCost: totalAmount * 0.7,
+    durationHours: 2,
+    subtotal: totalAmount * 0.9,
+    serviceCharge: 0,
+    taxAmount: totalAmount * 0.1,
+    totalAmount,
+    paymentMethod: "cash",
+  };
+
+  const handleSplitBill = (splits: number[]) => {
+    console.log("Split bill:", splits);
+    // Implementation for processing split bill
+  };
   
   const features = [
     {
@@ -66,23 +94,21 @@ export default function CashierFeatureMenu({
       description: "Cetak nota sementara (preview)",
       icon: Receipt,
       color: "text-orange-600",
-      action: onViewReceipt,
+      action: () => setReceiptOpen(true),
     },
     {
       title: "Split Bill",
       description: "Bagi tagihan untuk beberapa pembayaran",
       icon: Split,
       color: "text-pink-600",
-      action: () => {},
-      disabled: true,
+      action: () => setSplitBillOpen(true),
     },
     {
       title: "Extend Waktu",
       description: "Perpanjang durasi sesi ruangan",
       icon: Clock,
       color: "text-cyan-600",
-      action: () => {},
-      disabled: true,
+      action: onExtendTime,
     },
   ];
 
@@ -108,10 +134,8 @@ export default function CashierFeatureMenu({
             return (
               <Card
                 key={index}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  feature.disabled ? 'opacity-50' : 'hover:border-primary'
-                }`}
-                onClick={!feature.disabled ? feature.action : undefined}
+                className="cursor-pointer transition-all hover:shadow-md hover:border-primary"
+                onClick={feature.action}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
@@ -123,11 +147,6 @@ export default function CashierFeatureMenu({
                       <p className="text-sm text-muted-foreground mt-1">
                         {feature.description}
                       </p>
-                      {feature.disabled && (
-                        <span className="text-xs text-orange-500 mt-1 inline-block">
-                          Segera hadir
-                        </span>
-                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -135,6 +154,19 @@ export default function CashierFeatureMenu({
             );
           })}
         </div>
+
+        <SplitBillDialog
+          open={splitBillOpen}
+          onOpenChange={setSplitBillOpen}
+          totalAmount={totalAmount}
+          onSplit={handleSplitBill}
+        />
+
+        <ReceiptPreviewDialog
+          open={receiptOpen}
+          onOpenChange={setReceiptOpen}
+          receiptData={dummyReceiptData}
+        />
 
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
           <div className="flex items-start gap-2">

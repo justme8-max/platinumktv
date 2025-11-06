@@ -11,6 +11,7 @@ import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
 import UpcomingBookingsWidget from "./UpcomingBookingsWidget";
 import PaymentDialog from "./PaymentDialog";
+import ShiftManagementDialog from "@/components/cashier/ShiftManagementDialog";
 import { Button } from "@/components/ui/button";
 import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare } from "lucide-react";
 import { toast } from "sonner";
@@ -194,7 +195,8 @@ export default function CashierDashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">{t('cashier_dashboard.rooms')}</h3>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <ShiftManagementDialog />
               <DemoDataManager />
               <Button
                 variant="outline"

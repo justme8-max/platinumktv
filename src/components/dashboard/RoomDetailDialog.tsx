@@ -113,10 +113,11 @@ export default function RoomDetailDialog({
             <CashierFeatureMenu
               roomId={room.id}
               roomName={room.room_name}
+              totalAmount={grandTotal}
               onAddItems={onAddItems}
               onProcessPayment={onEndSession}
               onRequestDiscount={() => {}}
-              onViewReceipt={() => {}}
+              onExtendTime={() => setExtendDialogOpen(true)}
             />
           </div>
         </DialogHeader>

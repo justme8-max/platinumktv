@@ -721,6 +721,60 @@ export type Database = {
           },
         ]
       }
+      shifts: {
+        Row: {
+          closing_balance: number | null
+          created_at: string
+          end_time: string | null
+          id: string
+          notes: string | null
+          opening_balance: number
+          start_time: string
+          status: string
+          total_card: number | null
+          total_cash: number | null
+          total_ewallet: number | null
+          total_transactions: number | null
+          total_transfer: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closing_balance?: number | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          notes?: string | null
+          opening_balance?: number
+          start_time?: string
+          status?: string
+          total_card?: number | null
+          total_cash?: number | null
+          total_ewallet?: number | null
+          total_transactions?: number | null
+          total_transfer?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          closing_balance?: number | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          notes?: string | null
+          opening_balance?: number
+          start_time?: string
+          status?: string
+          total_card?: number | null
+          total_cash?: number | null
+          total_ewallet?: number | null
+          total_transactions?: number | null
+          total_transfer?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stock_movements: {
         Row: {
           created_at: string | null
