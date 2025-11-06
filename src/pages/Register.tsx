@@ -113,7 +113,23 @@ export default function Register() {
           }
         }
 
-        toast.success("Pendaftaran berhasil! Silakan login.");
+        // Send verification email
+        try {
+          const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
+            body: {
+              email: validation.data.email,
+              fullName: validation.data.fullName,
+            }
+          });
+
+          if (emailError) {
+            console.error("Email sending error:", emailError);
+          }
+        } catch (emailError) {
+          console.error("Failed to send verification email:", emailError);
+        }
+
+        toast.success("Pendaftaran berhasil! Email verifikasi telah dikirim.");
         navigate("/login");
       }
     } catch (error: any) {
