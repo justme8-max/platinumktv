@@ -56,6 +56,64 @@ export default function Login() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    const demoEmail = "bitbuddy99@gmail.com";
+    const demoPassword = "Demo1234";
+    
+    try {
+      // Try to login first
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: demoEmail,
+        password: demoPassword,
+      });
+
+      // If login fails, create the account
+      if (loginError) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: demoEmail,
+          password: demoPassword,
+          options: {
+            data: {
+              full_name: "Demo User",
+              phone: "",
+            },
+            emailRedirectTo: `${window.location.origin}/`,
+          }
+        });
+
+        if (signUpError) throw signUpError;
+
+        if (signUpData.user) {
+          // Create profile
+          await supabase.from("profiles").insert({
+            id: signUpData.user.id,
+            full_name: "Demo User",
+            email: demoEmail,
+            phone: null,
+          });
+
+          // No role needed - handled by trigger
+          
+          // Now login
+          const { error: loginError2 } = await supabase.auth.signInWithPassword({
+            email: demoEmail,
+            password: demoPassword,
+          });
+
+          if (loginError2) throw loginError2;
+        }
+      }
+
+      toast.success("Demo login berhasil!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Gagal demo login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogleLogin = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -130,6 +188,15 @@ export default function Login() {
             <span className="px-4 bg-transparent text-white/60">atau</span>
           </div>
         </div>
+
+        <Button
+          type="button"
+          className="w-full h-12 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 border-0 rounded-xl font-medium shadow-lg transition-all"
+          onClick={handleDemoLogin}
+          disabled={loading}
+        >
+          🚀 Demo Login (No Registration)
+        </Button>
 
         <Button
           type="button"
