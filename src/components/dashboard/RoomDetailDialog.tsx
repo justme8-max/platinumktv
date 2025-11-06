@@ -254,6 +254,19 @@ export default function RoomDetailDialog({
         </div>
 
          <DialogFooter className="mt-6 flex gap-2">
+            {room.status === 'available' && (
+              <Button 
+                onClick={() => {
+                  // Start session for available room
+                  onUpdate(); // This will trigger the parent to start the session
+                  onOpenChange(false);
+                }}
+                className="w-full"
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Start Session
+              </Button>
+            )}
             {booking && (room.status === 'occupied' || room.status === 'reserved') && (
               <Button 
                 variant="outline"

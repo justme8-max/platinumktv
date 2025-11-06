@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface QuickAction {
   icon: any;
@@ -40,10 +41,15 @@ export default function QuickActions({ role, actions }: QuickActionsProps) {
       { icon: FileText, label: t("Riwayat", "History"), onClick: () => {}, variant: "outline" },
     ],
     cashier: [
-      { icon: Plus, label: t("Mulai Sesi", "Start Session"), onClick: () => {}, variant: "default" },
+      { 
+        icon: Plus, 
+        label: t("Mulai Sesi", "Start Session"), 
+        onClick: () => toast.info("Click on an available room card to start a session"),
+        variant: "default" 
+      },
       { icon: CalendarCheck, label: t("Booking", "Bookings"), onClick: () => navigate("/bookings"), variant: "default" },
-      { icon: DollarSign, label: t("Bayar", "Payment"), onClick: () => {}, variant: "outline" },
-      { icon: ShoppingCart, label: t("Pesanan", "Orders"), onClick: () => {}, variant: "outline" },
+      { icon: DollarSign, label: t("Bayar", "Payment"), onClick: () => toast.info("Select an occupied room to process payment"), variant: "outline" },
+      { icon: ShoppingCart, label: t("Pesanan", "Orders"), onClick: () => toast.info("Select an occupied room to add orders"), variant: "outline" },
     ],
     manager: [
       { icon: UserPlus, label: t("Tambah Karyawan", "Add Employee"), onClick: () => {}, variant: "default" },

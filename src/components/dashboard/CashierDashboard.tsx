@@ -14,6 +14,7 @@ import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare } from
 import { toast } from "sonner";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
+import DemoDataManager from "@/components/admin/DemoDataManager";
 
 export default function CashierDashboard() {
   const { t } = useLanguage();
@@ -96,8 +97,28 @@ export default function CashierDashboard() {
     }
   };
 
-  const handleRoomClick = (room: any) => {
+  const handleRoomClick = async (room: any) => {
     setSelectedRoom(room);
+    
+    // If room is available, start session immediately
+    if (room.status === 'available') {
+      try {
+        await startRoomSession(room.id);
+        // Reload the updated room data
+        const { data: updatedRoom } = await supabase
+          .from("rooms")
+          .select("*")
+          .eq("id", room.id)
+          .single();
+        
+        if (updatedRoom) {
+          setSelectedRoom(updatedRoom);
+        }
+      } catch (error) {
+        // Error already handled by startRoomSession
+      }
+    }
+    
     setDetailDialogOpen(true);
   };
 
@@ -210,6 +231,7 @@ export default function CashierDashboard() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">{t('cashier_dashboard.rooms')}</h3>
             <div className="flex items-center gap-4">
+              <DemoDataManager />
               <Button
                 variant="outline"
                 size="sm"
