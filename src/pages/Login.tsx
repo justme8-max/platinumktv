@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Music } from "lucide-react";
-import loginBg from "@/assets/login-background.png";
+import dashboardBg from "@/assets/dashboard-background.svg";
 import { loginSchema } from "@/lib/validation";
 
 export default function Login() {
@@ -60,7 +60,7 @@ export default function Login() {
     <div 
       className="min-h-screen flex items-center justify-start p-16 relative"
       style={{
-        backgroundImage: `url(${loginBg})`,
+        backgroundImage: `url(${dashboardBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

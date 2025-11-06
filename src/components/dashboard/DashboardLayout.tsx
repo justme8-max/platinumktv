@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LogOut, Music } from "lucide-react";
+import dashboardBg from "@/assets/dashboard-background.svg";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -20,8 +21,17 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card shadow-sm sticky top-0 z-50">
+    <div 
+      className="min-h-screen bg-background"
+      style={{
+        backgroundImage: `url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <header className="border-b border-border bg-card/95 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md">
