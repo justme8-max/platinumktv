@@ -23,9 +23,11 @@ import {
   LogIn, 
   LogOut,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  FileText
 } from "lucide-react";
 import { formatIDR } from "@/lib/currency";
+import ShiftReportDialog from "./ShiftReportDialog";
 
 interface Shift {
   id: string;
@@ -48,6 +50,8 @@ export default function ShiftManagementDialog() {
   const [openingBalance, setOpeningBalance] = useState("");
   const [closingBalance, setClosingBalance] = useState("");
   const [loading, setLoading] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [selectedShiftId, setSelectedShiftId] = useState<string | undefined>();
 
   useEffect(() => {
     if (open) {
@@ -168,6 +172,10 @@ export default function ShiftManagementDialog() {
         { duration: 5000 }
       );
 
+      // Open report dialog
+      setSelectedShiftId(activeShift.id);
+      setReportOpen(true);
+
       setClosingBalance("");
       setActiveShift(null);
       setOpen(false);
@@ -183,23 +191,24 @@ export default function ShiftManagementDialog() {
     : 0;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Clock className="h-4 w-4 mr-2" />
-          Shift Management
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <Clock className="h-4 w-4 mr-2" />
             Shift Management
-          </DialogTitle>
-          <DialogDescription>
-            Kelola shift kasir dan cash drawer
-          </DialogDescription>
-        </DialogHeader>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Shift Management
+            </DialogTitle>
+            <DialogDescription>
+              Kelola shift kasir dan cash drawer
+            </DialogDescription>
+          </DialogHeader>
 
         {!activeShift ? (
           <div className="space-y-4">
@@ -336,9 +345,28 @@ export default function ShiftManagementDialog() {
               <LogOut className="h-4 w-4 mr-2" />
               End Shift
             </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedShiftId(activeShift.id);
+                setReportOpen(true);
+              }}
+              className="w-full"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              View Shift Report
+            </Button>
           </div>
         )}
       </DialogContent>
     </Dialog>
+
+    <ShiftReportDialog
+      open={reportOpen}
+      onOpenChange={setReportOpen}
+      shiftId={selectedShiftId}
+    />
+  </>
   );
 }

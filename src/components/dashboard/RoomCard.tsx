@@ -16,7 +16,7 @@ interface Room {
   room_type: string;
   capacity: number;
   hourly_rate: number;
-  status: "available" | "occupied" | "maintenance" | "reserved";
+  status: "available" | "occupied" | "maintenance" | "reserved" | "cleaning";
   current_session_start?: string;
 }
 
@@ -38,10 +38,13 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
       className: "bg-red-500 text-white",
     },
     maintenance: {
-      className: "bg-yellow-500 text-white",
+      className: "bg-orange-500 text-white",
     },
     reserved: {
       className: "bg-blue-500 text-white",
+    },
+    cleaning: {
+      className: "bg-cyan-500 text-white",
     },
   };
   
@@ -60,7 +63,9 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
           onClick && "hover:border-primary/50",
           room.status === 'occupied' && 'bg-red-50/50 border-red-200',
           room.status === 'available' && 'bg-green-50/50 border-green-200',
-          room.status === 'maintenance' && 'bg-yellow-50/50 border-yellow-200',
+          room.status === 'maintenance' && 'bg-orange-50/50 border-orange-200',
+          room.status === 'cleaning' && 'bg-cyan-50/50 border-cyan-200',
+          room.status === 'reserved' && 'bg-blue-50/50 border-blue-200',
         )}
         onClick={onClick}
       >

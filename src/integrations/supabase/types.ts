@@ -1007,7 +1007,12 @@ export type Database = {
       payment_method: "cash" | "card" | "ewallet" | "transfer"
       purchase_status: "pending" | "approved" | "rejected" | "completed"
       recurring_frequency: "weekly" | "monthly"
-      room_status: "available" | "occupied" | "maintenance" | "reserved"
+      room_status:
+        | "available"
+        | "occupied"
+        | "maintenance"
+        | "reserved"
+        | "cleaning"
       transaction_type: "room_rental" | "food_beverage" | "other"
       user_role:
         | "owner"
@@ -1150,7 +1155,13 @@ export const Constants = {
       payment_method: ["cash", "card", "ewallet", "transfer"],
       purchase_status: ["pending", "approved", "rejected", "completed"],
       recurring_frequency: ["weekly", "monthly"],
-      room_status: ["available", "occupied", "maintenance", "reserved"],
+      room_status: [
+        "available",
+        "occupied",
+        "maintenance",
+        "reserved",
+        "cleaning",
+      ],
       transaction_type: ["room_rental", "food_beverage", "other"],
       user_role: [
         "owner",
