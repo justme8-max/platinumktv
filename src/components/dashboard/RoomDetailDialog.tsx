@@ -12,6 +12,7 @@ import { useRoomTimer } from "@/hooks/useRoomTimer";
 import BookingTimeline from "./BookingTimeline";
 import ExtendTimeDialog from "./ExtendTimeDialog";
 import RoomBookingHistory from "./RoomBookingHistory";
+import CashierFeatureMenu from "@/components/cashier/CashierFeatureMenu";
 
 interface Room {
   id: string;
@@ -105,9 +106,19 @@ export default function RoomDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">
-            {t('room_detail.title')} - {room.room_name}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl">
+              {t('room_detail.title')} - {room.room_name}
+            </DialogTitle>
+            <CashierFeatureMenu
+              roomId={room.id}
+              roomName={room.room_name}
+              onAddItems={onAddItems}
+              onProcessPayment={onEndSession}
+              onRequestDiscount={() => {}}
+              onViewReceipt={() => {}}
+            />
+          </div>
         </DialogHeader>
 
         {/* Low Time Alert */}
