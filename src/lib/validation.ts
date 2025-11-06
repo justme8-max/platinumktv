@@ -46,6 +46,7 @@ export const registerSchema = z.object({
   confirmPassword: z.string(),
   fullName: z.string().trim().min(2, "Nama lengkap minimal 2 karakter").max(100, "Nama maksimal 100 karakter"),
   phone: z.string().trim().regex(/^(\+?62|0)[0-9]{9,13}$/, "Format nomor telepon tidak valid").optional().or(z.literal("")),
+  division: z.string().trim().min(1, "Jabatan wajib dipilih"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Password tidak cocok",
   path: ["confirmPassword"],

@@ -3,6 +3,13 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Music, Loader2, ArrowLeft } from "lucide-react";
@@ -15,6 +22,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [division, setDivision] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -40,7 +48,8 @@ export default function Register() {
         password, 
         confirmPassword, 
         fullName, 
-        phone 
+        phone,
+        division
       });
       
       if (!validation.success) {
@@ -170,6 +179,24 @@ export default function Register() {
               onChange={(e) => setPhone(e.target.value)}
               className="h-11 bg-white/95 border-0 rounded-xl text-base shadow-sm focus-visible:ring-1"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="division" className="text-white/90 text-sm font-normal">
+              Jabatan
+            </Label>
+            <Select value={division} onValueChange={setDivision} required>
+              <SelectTrigger className="h-11 bg-white/95 border-0 rounded-xl text-base shadow-sm">
+                <SelectValue placeholder="Pilih jabatan" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="owner">Owner</SelectItem>
+                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="cashier">Kasir</SelectItem>
+                <SelectItem value="waiter">Pelayan</SelectItem>
+                <SelectItem value="accountant">Akuntan</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
