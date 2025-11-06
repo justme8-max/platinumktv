@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Music } from "lucide-react";
 import loginBg from "@/assets/login-background.png";
+import { loginSchema } from "@/lib/validation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,22 +15,42 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        navigate("/dashboard");
+      }
+    };
+    checkAuth();
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Validate input with zod
+      const validation = loginSchema.safeParse({ email, password });
+      if (!validation.success) {
+        const firstError = validation.error.issues[0];
+        toast.error(firstError.message);
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: validation.data.email,
+        password: validation.data.password,
       });
 
       if (error) throw error;
 
-      toast.success("Welcome back!");
+      toast.success("Selamat datang kembali!");
       navigate("/dashboard");
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign in");
+      toast.error(error.message || "Gagal masuk");
     } finally {
       setLoading(false);
     }

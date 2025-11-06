@@ -6,7 +6,7 @@ type Language = "id" | "en";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, placeholders?: Record<string, string | number>) => string;
+  t: (key: string, fallbackOrPlaceholders?: string | Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -20,11 +20,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("id");
 
   const t = useCallback(
-    (key: string, placeholders?: Record<string, string | number>): string => {
+    (key: string, fallbackOrPlaceholders?: string | Record<string, string | number>): string => {
       const langTranslations = translations[language];
       let translation = getNestedValue(langTranslations, key);
 
       if (!translation) {
+        // If no translation found and a string fallback is provided, use it for English
+        if (typeof fallbackOrPlaceholders === 'string') {
+          return language === 'en' ? fallbackOrPlaceholders : key;
+        }
+        
         console.warn(`Translation not found for key: ${key}`);
         // Fallback to English if translation is not found in the current language
         const fallbackLang = translations["en"];
@@ -34,8 +39,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      if (placeholders) {
-        Object.entries(placeholders).forEach(([placeholder, value]) => {
+      // Handle placeholders if provided as object
+      if (fallbackOrPlaceholders && typeof fallbackOrPlaceholders === 'object') {
+        Object.entries(fallbackOrPlaceholders).forEach(([placeholder, value]) => {
           translation = translation!.replace(`{${placeholder}}`, String(value));
         });
       }

@@ -36,7 +36,7 @@ export default function RoomDetailDialog({
   const [duration, setDuration] = useState<string>("");
   const [estimatedCost, setEstimatedCost] = useState<number>(0);
   const [orderedItems, setOrderedItems] = useState<any[]>([]);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const calculateDurationAndCost = () => {
     if (room?.current_session_start) {
@@ -58,14 +58,17 @@ export default function RoomDetailDialog({
   const fetchOrderedItems = async () => {
     if (room?.id) {
        const { data } = await supabase
-        .from('room_orders')
+        .from('sales_items')
         .select(`
           id,
           quantity,
-          products ( name, price )
+          unit_price,
+          products (
+            name_id,
+            name_en
+          )
         `)
-        .eq('room_id', room.id)
-        .eq('is_paid', false)
+        .eq('transaction_id', room.id)
 
       if (data) {
         setOrderedItems(data);
@@ -87,7 +90,7 @@ export default function RoomDetailDialog({
 
   if (!room) return null;
 
-  const totalItemsCost = orderedItems.reduce((acc, item) => acc + item.products.price * item.quantity, 0);
+  const totalItemsCost = orderedItems.reduce((acc, item) => acc + item.unit_price * item.quantity, 0);
   const grandTotal = estimatedCost + totalItemsCost;
 
   return (
@@ -179,13 +182,13 @@ export default function RoomDetailDialog({
                   {orderedItems.map(item => (
                     <li key={item.id} className="flex justify-between items-center">
                       <div>
-                        <p className="font-semibold">{item.products.name}</p>
+                        <p className="font-semibold">{item.products[`name_${language === "id" ? "id" : "en"}`]}</p>
                         <p className="text-sm text-muted-foreground">
-                          {item.quantity} x Rp {item.products.price.toLocaleString()}
+                          {item.quantity} x Rp {item.unit_price.toLocaleString()}
                         </p>
                       </div>
                       <p className="font-semibold">
-                        Rp {(item.quantity * item.products.price).toLocaleString()}
+                        Rp {(item.quantity * item.unit_price).toLocaleString()}
                       </p>
                     </li>
                   ))}

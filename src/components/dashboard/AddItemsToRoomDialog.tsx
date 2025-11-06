@@ -66,15 +66,21 @@ export default function AddItemsToRoomDialog({ open, onOpenChange, room, onUpdat
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const orderItems = Object.entries(cart).map(([productId, quantity]) => ({
-        room_id: room.id,
-        product_id: productId,
-        quantity,
-        cashier_id: user?.id,
-        is_paid: false,
-      }));
+      const product = products.find(p => Object.entries(cart).some(([id]) => id === p.id));
+      if (!product) throw new Error("Product not found");
+      
+      const salesItems = Object.entries(cart).map(([productId, quantity]) => {
+        const prod = products.find(p => p.id === productId);
+        return {
+          product_id: productId,
+          quantity,
+          unit_price: prod.price,
+          subtotal: prod.price * quantity,
+          transaction_id: null, // Will be linked later via room transactions
+        };
+      });
 
-      const { error } = await supabase.from("room_orders").insert(orderItems);
+      const { error } = await supabase.from("sales_items").insert(salesItems);
 
       if (error) throw error;
 
