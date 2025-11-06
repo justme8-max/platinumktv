@@ -12,8 +12,9 @@ import RoleSpecificWidget from "./RoleSpecificWidget";
 import UpcomingBookingsWidget from "./UpcomingBookingsWidget";
 import PaymentDialog from "./PaymentDialog";
 import ShiftManagementDialog from "@/components/cashier/ShiftManagementDialog";
+import DailyRevenueAnalytics from "./DailyRevenueAnalytics";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare } from "lucide-react";
+import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare, Bell } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
@@ -63,9 +64,52 @@ export default function CashierDashboard() {
       )
       .subscribe();
 
+    // Real-time order notifications
+    const salesChannel = supabase
+      .channel('sales-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'sales_items',
+        },
+        async (payload) => {
+          console.log('New order item:', payload);
+          
+          // Get product name and room info
+          const { data: item } = await supabase
+            .from('sales_items')
+            .select(`
+              quantity,
+              products (name_id),
+              transactions (
+                room_id,
+                rooms (room_name)
+              )
+            `)
+            .eq('id', payload.new.id)
+            .single();
+
+          if (item && item.transactions?.rooms) {
+            toast.success(
+              `🔔 Pesanan Baru di ${item.transactions.rooms.room_name}`,
+              {
+                description: `${item.quantity}x ${item.products.name_id}`,
+                duration: 5000,
+              }
+            );
+          }
+
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(roomsChannel);
       supabase.removeChannel(transactionsChannel);
+      supabase.removeChannel(salesChannel);
     };
   }, []);
 
@@ -189,12 +233,23 @@ export default function CashierDashboard() {
         </div>
 
         <div>
+          <DailyRevenueAnalytics />
+        </div>
+
+        <div>
           <RoleSpecificWidget role="cashier" />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold">{t('cashier_dashboard.rooms')}</h3>
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              {t('cashier_dashboard.rooms')}
+              {rooms.length === 0 && (
+                <span className="text-sm font-normal text-muted-foreground">
+                  (Kosong - Gunakan "Demo Data" untuk mengisi)
+                </span>
+              )}
+            </h3>
             <div className="flex items-center gap-2">
               <ShiftManagementDialog />
               <DemoDataManager />
@@ -221,6 +276,17 @@ export default function CashierDashboard() {
               />
             ))}
           </div>
+
+          {rooms.length === 0 && (
+            <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
+              <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-lg font-medium mb-2">Tidak ada data ruangan</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                Klik tombol "Demo Data" di atas untuk mengisi data demo<br />
+                (Login sebagai Owner/Manager untuk seed demo data)
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
