@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Music } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import dashboardBg from "@/assets/dashboard-background.svg";
 import { loginSchema } from "@/lib/validation";
 import DemoAccountsDialog from "@/components/auth/DemoAccountsDialog";
@@ -74,7 +74,7 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-start p-16 relative"
+      className="min-h-screen flex items-center justify-start p-4 md:p-16 relative overflow-y-auto"
       style={{
         backgroundImage: `url(${dashboardBg})`,
         backgroundSize: 'cover',
@@ -82,7 +82,15 @@ export default function Login() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="w-full max-w-sm relative z-10 space-y-8">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 z-20 bg-white/10 hover:bg-white/20 text-white"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
+      <div className="w-full max-w-sm relative z-10 space-y-8 my-8 md:my-0">
         <div className="space-y-2">
           <h1 className="text-5xl font-semibold text-white tracking-tight">Platinum High KTV</h1>
           <p className="text-base text-white/80">

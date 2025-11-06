@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
-import RoomCard from "./RoomCard";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
 import ApprovalList from "@/components/manager/ApprovalList";
@@ -135,21 +134,12 @@ export default function ManagerDashboard() {
               <CheckSquare className="h-4 w-4 mr-2" />
               Persetujuan
             </TabsTrigger>
-            <TabsTrigger value="rooms">Room Status</TabsTrigger>
             <TabsTrigger value="employees">Karyawan</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
           </TabsList>
 
           <TabsContent value="approvals" className="space-y-4">
             <ApprovalList />
-          </TabsContent>
-
-          <TabsContent value="rooms" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {rooms.map((room) => (
-                <RoomCard key={room.id} room={room} />
-              ))}
-            </div>
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">

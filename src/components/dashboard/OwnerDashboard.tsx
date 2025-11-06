@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
-import RoomCard from "./RoomCard";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -269,7 +268,6 @@ export default function OwnerDashboard() {
             <TabsTrigger value="bestsellers">{t("Best Sellers", "Best Sellers")}</TabsTrigger>
             <TabsTrigger value="inventory">{t("Inventory", "Inventory")}</TabsTrigger>
             <TabsTrigger value="purchasing">{t("Purchasing", "Purchasing")}</TabsTrigger>
-            <TabsTrigger value="rooms">{t("Ruangan", "Rooms")}</TabsTrigger>
             <TabsTrigger value="employees">{t("Karyawan", "Employees")}</TabsTrigger>
           </TabsList>
 
@@ -294,14 +292,6 @@ export default function OwnerDashboard() {
               onAdd={() => setPurchaseDialogOpen(true)}
               userRole="owner"
             />
-          </TabsContent>
-
-          <TabsContent value="rooms" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {rooms.map((room) => (
-                <RoomCard key={room.id} room={room} />
-              ))}
-            </div>
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">
