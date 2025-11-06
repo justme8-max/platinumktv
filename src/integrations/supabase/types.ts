@@ -41,6 +41,106 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_channel_members: {
+        Row: {
+          channel_id: string | null
+          id: string
+          joined_at: string
+          last_read_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_channel_members_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "chat_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_channels: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          channel_id: string | null
+          content: string
+          created_at: string
+          id: string
+          is_all_mention: boolean | null
+          mentions: Json | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_all_mention?: boolean | null
+          mentions?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_all_mention?: boolean | null
+          mentions?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "chat_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           created_at: string | null
@@ -519,6 +619,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_use_all_mention: { Args: { _user_id: string }; Returns: boolean }
       generate_employee_id: {
         Args: { emp_division: string; emp_name: string }
         Returns: string

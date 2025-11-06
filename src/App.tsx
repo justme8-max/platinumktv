@@ -3,9 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import PWAInstallPrompt from "@/components/common/PWAInstallPrompt";
+import FloatingChatButton from "@/components/chat/FloatingChatButton";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -32,6 +33,13 @@ function AuthStateListener() {
   return null;
 }
 
+function ConditionalFloatingChat() {
+  const location = useLocation();
+  const showChat = location.pathname === '/dashboard';
+
+  return showChat ? <FloatingChatButton /> : null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -48,6 +56,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ConditionalFloatingChat />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

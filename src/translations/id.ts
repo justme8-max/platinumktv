@@ -10,6 +10,15 @@ export const id = {
     no_role_title: "Tidak Ada Peran yang Ditetapkan",
     no_role_description: "Silakan hubungi administrator untuk menetapkan peran untuk Anda.",
   },
+  chat: {
+    team_chat: "Chat Tim",
+    you_can_use_all: "Anda dapat menggunakan @all",
+    type_message: "Ketik pesan...",
+    mention_all: "Mention semua",
+    no_permission_all: "Anda tidak memiliki izin untuk menggunakan @all",
+    failed_send: "Gagal mengirim pesan",
+    at_all: "@semua",
+  },
   cashier_dashboard: {
     title: "Point of Sale",
     description: "Kelola pemesanan ruangan dan transaksi",

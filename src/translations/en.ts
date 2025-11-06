@@ -10,6 +10,15 @@ export const en = {
     no_role_title: "No Role Assigned",
     no_role_description: "Please contact an administrator to assign you a role.",
   },
+  chat: {
+    team_chat: "Team Chat",
+    you_can_use_all: "You can use @all",
+    type_message: "Type a message...",
+    mention_all: "Mention all",
+    no_permission_all: "You don't have permission to use @all",
+    failed_send: "Failed to send message",
+    at_all: "@all",
+  },
   cashier_dashboard: {
     title: "Point of Sale",
     description: "Manage room bookings and transactions",
