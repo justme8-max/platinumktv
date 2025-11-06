@@ -24,7 +24,7 @@ interface RoomCardProps {
 
 export default function RoomCard({ room, onClick }: RoomCardProps) {
   const { t } = useLanguage();
-  const { timeRemaining } = useRoomTimer(room.id, room.status);
+  const { timeRemaining, isLowTime } = useRoomTimer(room.id, room.status);
 
   const statusConfig = {
     available: {
@@ -73,7 +73,10 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
           </div>
           
           {timeRemaining && (room.status === 'occupied' || room.status === 'reserved') && (
-            <div className="flex items-center gap-2 text-orange-600 font-semibold">
+            <div className={cn(
+              "flex items-center gap-2 font-semibold",
+              isLowTime ? "text-red-600 animate-pulse" : "text-orange-600"
+            )}>
               <Timer className="h-4 w-4" />
               <span>{t('room_card.time_remaining')}: {timeRemaining}</span>
             </div>

@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, DollarSign, ShoppingCart, LogOut, Info, Timer } from "lucide-react";
+import { Clock, DollarSign, ShoppingCart, LogOut, Info, Timer, Plus, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRoomTimer } from "@/hooks/useRoomTimer";
+import BookingTimeline from "./BookingTimeline";
+import ExtendTimeDialog from "./ExtendTimeDialog";
 
 interface Room {
   id: string;
@@ -37,8 +40,9 @@ export default function RoomDetailDialog({
   const [duration, setDuration] = useState<string>("");
   const [estimatedCost, setEstimatedCost] = useState<number>(0);
   const [orderedItems, setOrderedItems] = useState<any[]>([]);
+  const [extendDialogOpen, setExtendDialogOpen] = useState(false);
   const { t, language } = useLanguage();
-  const { timeRemaining } = useRoomTimer(room?.id || '', room?.status || '');
+  const { timeRemaining, isLowTime, booking } = useRoomTimer(room?.id || '', room?.status || '');
 
   const calculateDurationAndCost = () => {
     if (room?.current_session_start) {
@@ -104,6 +108,16 @@ export default function RoomDetailDialog({
           </DialogTitle>
         </DialogHeader>
 
+        {/* Low Time Alert */}
+        {isLowTime && booking && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {t('room_detail.low_time_warning')}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left Side: Room & Session Info */}
           <div className="space-y-6">
@@ -149,8 +163,24 @@ export default function RoomDetailDialog({
                     </div>
                   </>
                 )}
-              </CardContent>
+               </CardContent>
             </Card>
+
+            {/* Booking Timeline */}
+            {booking && (room.status === 'occupied' || room.status === 'reserved') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('room_detail.booking_timeline')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <BookingTimeline 
+                    startTime={booking.start_time}
+                    endTime={booking.end_time}
+                    bookingDate={booking.booking_date}
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
                <CardHeader>
@@ -211,7 +241,16 @@ export default function RoomDetailDialog({
           </Card>
         </div>
 
-         <DialogFooter className="mt-6">
+         <DialogFooter className="mt-6 flex gap-2">
+            {booking && (room.status === 'occupied' || room.status === 'reserved') && (
+              <Button 
+                variant="outline"
+                onClick={() => setExtendDialogOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t('room_detail.extend_time')}
+              </Button>
+            )}
             <Button 
               variant="destructive" 
               onClick={onEndSession}
@@ -221,6 +260,20 @@ export default function RoomDetailDialog({
              {t('room_detail.end_session_and_pay')}
             </Button>
         </DialogFooter>
+
+        {/* Extend Time Dialog */}
+        {booking && (
+          <ExtendTimeDialog
+            open={extendDialogOpen}
+            onOpenChange={setExtendDialogOpen}
+            bookingId={booking.id}
+            hourlyRate={room.hourly_rate}
+            onSuccess={() => {
+              onUpdate();
+              setExtendDialogOpen(false);
+            }}
+          />
+        )}
 
       </DialogContent>
     </Dialog>
