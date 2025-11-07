@@ -5,9 +5,8 @@ import DashboardLayout from "./DashboardLayout";
 import RoomCard from "./RoomCard";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import StatsCard from "./StatsCard";
+import { ShoppingCart, Clock, Package } from "lucide-react";
 import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
 
 export default function WaiterDashboard() {
@@ -15,6 +14,11 @@ export default function WaiterDashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [addItemsOpen, setAddItemsOpen] = useState(false);
+  const [stats, setStats] = useState({
+    activeOrders: 0,
+    occupiedRooms: 0,
+    pendingItems: 0,
+  });
 
   useEffect(() => {
     loadRooms();
@@ -38,6 +42,24 @@ export default function WaiterDashboard() {
       .order("room_number");
 
     setRooms(data || []);
+
+    // Calculate stats
+    const occupied = data?.filter(r => r.status === "occupied").length || 0;
+    
+    // Get today's sales items count
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const { data: salesData } = await supabase
+      .from("sales_items")
+      .select("*")
+      .gte("created_at", today.toISOString());
+    
+    setStats({
+      activeOrders: salesData?.length || 0,
+      occupiedRooms: occupied,
+      pendingItems: salesData?.length || 0,
+    });
   };
 
   const handleRoomClick = (room: any) => {
@@ -52,6 +74,24 @@ export default function WaiterDashboard() {
           <div>
             <h2 className="text-3xl font-bold mb-2">{t("Dashboard Waiter/Waitress", "Waiter/Waitress Dashboard")}</h2>
             <p className="text-muted-foreground">{t("Kelola pesanan ruangan", "Manage room orders")}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatsCard
+              title={t("Pesanan Aktif", "Active Orders")}
+              value={stats.activeOrders}
+              icon={ShoppingCart}
+            />
+            <StatsCard
+              title={t("Ruangan Terisi", "Occupied Rooms")}
+              value={stats.occupiedRooms}
+              icon={Clock}
+            />
+            <StatsCard
+              title={t("Item Dipesan", "Items Ordered")}
+              value={stats.pendingItems}
+              icon={Package}
+            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

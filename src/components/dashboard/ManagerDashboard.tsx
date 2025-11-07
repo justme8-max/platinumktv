@@ -5,11 +5,15 @@ import StatsCard from "./StatsCard";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
 import ApprovalList from "@/components/manager/ApprovalList";
+import RoomCard from "./RoomCard";
+import RoomDetailDialog from "./RoomDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, TrendingDown, Home, Plus, UserPlus, CheckSquare } from "lucide-react";
+import { DollarSign, TrendingDown, Home, Plus, UserPlus, CheckSquare, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EmployeeDialog from "@/components/employees/EmployeeDialog";
 import EmployeeList from "@/components/employees/EmployeeList";
+import { formatIDR } from "@/lib/currency";
+import DemoDataManager from "@/components/admin/DemoDataManager";
 
 export default function ManagerDashboard() {
   const [stats, setStats] = useState({
@@ -21,6 +25,8 @@ export default function ManagerDashboard() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<any>(null);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -85,6 +91,11 @@ export default function ManagerDashboard() {
     setEditEmployee(null);
   };
 
+  const handleRoomClick = (room: any) => {
+    setSelectedRoom(room);
+    setDetailDialogOpen(true);
+  };
+
   return (
     <>
       <DashboardLayout role="manager">
@@ -102,17 +113,17 @@ export default function ManagerDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatsCard
-            title="Today's Revenue"
-            value={`₱${stats.todayRevenue.toLocaleString()}`}
+            title="Omset Hari Ini"
+            value={formatIDR(stats.todayRevenue)}
             icon={DollarSign}
           />
           <StatsCard
-            title="Today's Expenses"
-            value={`₱${stats.todayExpenses.toLocaleString()}`}
+            title="Pengeluaran Hari Ini"
+            value={formatIDR(stats.todayExpenses)}
             icon={TrendingDown}
           />
           <StatsCard
-            title="Occupied Rooms"
+            title="Ruangan Terisi"
             value={stats.occupiedRooms}
             icon={Home}
           />
@@ -128,8 +139,12 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        <Tabs defaultValue="approvals" className="space-y-6">
+        <Tabs defaultValue="rooms" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="rooms">
+              <Building2 className="h-4 w-4 mr-2" />
+              Ruangan
+            </TabsTrigger>
             <TabsTrigger value="approvals">
               <CheckSquare className="h-4 w-4 mr-2" />
               Persetujuan
@@ -137,6 +152,31 @@ export default function ManagerDashboard() {
             <TabsTrigger value="employees">Karyawan</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="rooms" className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">Monitoring Ruangan</h3>
+              <DemoDataManager />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {rooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onClick={() => handleRoomClick(room)}
+                />
+              ))}
+            </div>
+            {rooms.length === 0 && (
+              <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
+                <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-lg font-medium mb-2">Belum ada ruangan</p>
+                <p className="text-sm text-muted-foreground">
+                  Klik "Demo Data" untuk mengisi data demo
+                </p>
+              </div>
+            )}
+          </TabsContent>
 
           <TabsContent value="approvals" className="space-y-4">
             <ApprovalList />
@@ -177,6 +217,15 @@ export default function ManagerDashboard() {
         onOpenChange={handleDialogClose}
         onSuccess={loadDashboardData}
         employee={editEmployee}
+      />
+
+      <RoomDetailDialog
+        room={selectedRoom}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onUpdate={loadDashboardData}
+        onAddItems={() => {}}
+        onEndSession={() => {}}
       />
     </>
   );
