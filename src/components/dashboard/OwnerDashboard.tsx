@@ -19,6 +19,7 @@ import BestSellersChart from "@/components/analytics/BestSellersChart";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
 import UserRoleManagement from "@/components/admin/UserRoleManagement";
+import WaiterAssignment from "@/components/admin/WaiterAssignment";
 
 export default function OwnerDashboard() {
   const { t } = useLanguage();
@@ -270,6 +271,7 @@ export default function OwnerDashboard() {
             <TabsTrigger value="inventory">{t("Inventory", "Inventory")}</TabsTrigger>
             <TabsTrigger value="purchasing">{t("Purchasing", "Purchasing")}</TabsTrigger>
             <TabsTrigger value="employees">{t("Karyawan", "Employees")}</TabsTrigger>
+            <TabsTrigger value="waiters">{t("Penugasan Pelayan", "Waiter Assignment")}</TabsTrigger>
             <TabsTrigger value="roles">{t("User Roles", "User Roles")}</TabsTrigger>
           </TabsList>
 
@@ -310,6 +312,10 @@ export default function OwnerDashboard() {
               onDelete={loadDashboardData}
               canDelete={true}
             />
+          </TabsContent>
+
+          <TabsContent value="waiters" className="space-y-4">
+            <WaiterAssignment />
           </TabsContent>
 
           <TabsContent value="roles" className="space-y-4">

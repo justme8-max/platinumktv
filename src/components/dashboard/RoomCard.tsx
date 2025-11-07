@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Timer, Info } from "lucide-react";
+import { Clock, Users, Timer, Info, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatIDR } from "@/lib/currency";
 import { useRoomTimer } from "@/hooks/useRoomTimer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RoomTransactionHistory from "./RoomTransactionHistory";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Room {
   id: string;
@@ -18,6 +19,7 @@ interface Room {
   hourly_rate: number;
   status: "available" | "occupied" | "maintenance" | "reserved" | "cleaning";
   current_session_start?: string;
+  waiter_id?: string;
 }
 
 interface RoomCardProps {
@@ -29,6 +31,36 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
   const { t } = useLanguage();
   const { timeRemaining, isLowTime } = useRoomTimer(room.id, room.status);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [waiterName, setWaiterName] = useState<string | null>(null);
+  const [waiterBusy, setWaiterBusy] = useState(false);
+
+  useEffect(() => {
+    const fetchWaiterInfo = async () => {
+      if (room.waiter_id) {
+        // Get waiter name
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', room.waiter_id)
+          .single();
+        
+        if (profile) {
+          setWaiterName(profile.full_name);
+        }
+
+        // Check if waiter is busy (assigned to occupied rooms)
+        const { data: assignments } = await supabase
+          .from('rooms')
+          .select('status')
+          .eq('waiter_id', room.waiter_id)
+          .eq('status', 'occupied');
+        
+        setWaiterBusy((assignments?.length || 0) > 0);
+      }
+    };
+
+    fetchWaiterInfo();
+  }, [room.waiter_id]);
 
   const statusConfig = {
     available: {
@@ -113,6 +145,25 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
               )}>
                 <Timer className="h-4 w-4" />
                 <span>{t('room_card.time_remaining')}: {timeRemaining}</span>
+              </div>
+            )}
+
+            {/* Waiter Assignment */}
+            {waiterName && (
+              <div className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-md text-sm",
+                waiterBusy 
+                  ? "bg-destructive/20 text-destructive-foreground" 
+                  : "bg-success/20 text-success-foreground"
+              )}>
+                <UserCircle className="h-4 w-4" />
+                <span>{waiterName}</span>
+                <span className={cn(
+                  "ml-auto text-xs px-2 py-0.5 rounded-full",
+                  waiterBusy ? "bg-destructive text-destructive-foreground" : "bg-success text-success-foreground"
+                )}>
+                  {waiterBusy ? "Sibuk" : "Free"}
+                </span>
               </div>
             )}
             

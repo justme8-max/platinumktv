@@ -66,21 +66,36 @@ export default function RoomDetailDialog({
 
   const fetchOrderedItems = async () => {
     if (room?.id) {
-       const { data } = await supabase
-        .from('sales_items')
-        .select(`
-          id,
-          quantity,
-          unit_price,
-          products (
-            name_id,
-            name_en
-          )
-        `)
-        .eq('transaction_id', room.id)
+      // First get transactions for this room
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('id')
+        .eq('room_id', room.id)
+        .order('created_at', { ascending: false });
 
-      if (data) {
-        setOrderedItems(data);
+      if (transactions && transactions.length > 0) {
+        // Get all transaction IDs
+        const transactionIds = transactions.map(t => t.id);
+        
+        // Fetch sales items for these transactions
+        const { data } = await supabase
+          .from('sales_items')
+          .select(`
+            id,
+            quantity,
+            unit_price,
+            products (
+              name_id,
+              name_en
+            )
+          `)
+          .in('transaction_id', transactionIds);
+
+        if (data) {
+          setOrderedItems(data);
+        }
+      } else {
+        setOrderedItems([]);
       }
     }
   }

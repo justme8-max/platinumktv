@@ -31,8 +31,8 @@ export const id = {
     today_revenue: "Omset Hari Ini",
     active_sessions: "Sesi Aktif",
     rooms: "Ruangan",
-    room_click_hint: "💡 Ruang hijau: Klik untuk mulai sesi | Ruang merah: Klik untuk lihat detail",
-    room_session_started: "Sesi ruangan dimulai",
+    room_click_hint: "💡 Ruang hijau: Klik untuk Open Room | Ruang merah: Klik untuk lihat detail",
+    room_session_started: "Room dibuka",
     session_ended: "Sesi selesai. Total: IDR {amount}",
   },
   room_status: {
@@ -47,7 +47,11 @@ export const id = {
     guests: "{count} tamu",
     hour: "jam",
     time_remaining: "Sisa Waktu",
-    click_to_start: "👆 Klik untuk Mulai Sesi",
+    click_to_start: "👆 Klik untuk Open Room",
+    waiter_assigned: "Pelayan ditugaskan",
+    no_waiter: "Belum ada pelayan",
+    waiter_free: "Pelayan tersedia",
+    waiter_busy: "Pelayan sibuk",
   },
   room_detail: {
     title: "Detail Ruangan",

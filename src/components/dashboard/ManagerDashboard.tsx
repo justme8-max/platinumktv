@@ -14,6 +14,7 @@ import EmployeeDialog from "@/components/employees/EmployeeDialog";
 import EmployeeList from "@/components/employees/EmployeeList";
 import { formatIDR } from "@/lib/currency";
 import DemoDataManager from "@/components/admin/DemoDataManager";
+import WaiterAssignment from "@/components/admin/WaiterAssignment";
 
 export default function ManagerDashboard() {
   const [stats, setStats] = useState({
@@ -150,6 +151,7 @@ export default function ManagerDashboard() {
               Persetujuan
             </TabsTrigger>
             <TabsTrigger value="employees">Karyawan</TabsTrigger>
+            <TabsTrigger value="waiters">Penugasan Pelayan</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
           </TabsList>
 
@@ -201,6 +203,10 @@ export default function ManagerDashboard() {
               onDelete={loadDashboardData}
               canDelete={false}
             />
+          </TabsContent>
+
+          <TabsContent value="waiters" className="space-y-4">
+            <WaiterAssignment />
           </TabsContent>
 
           <TabsContent value="expenses" className="space-y-4">

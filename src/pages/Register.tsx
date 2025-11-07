@@ -102,6 +102,23 @@ export default function Register() {
 
           if (roleError) {
             console.error("Role creation error:", roleError);
+            toast.error("Gagal menambahkan role");
+          }
+
+          // Create employee record if division is provided
+          const employeeId = `EMP-${data.user.id.substring(0, 8).toUpperCase()}`;
+          const { error: empError } = await supabase
+            .from("employees")
+            .insert({
+              user_id: data.user.id,
+              employee_id: employeeId,
+              name: validation.data.fullName,
+              division: division,
+              phone: validation.data.phone || null,
+            });
+
+          if (empError) {
+            console.error("Employee creation error:", empError);
           }
         }
 

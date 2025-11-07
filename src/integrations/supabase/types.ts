@@ -647,6 +647,7 @@ export type Database = {
           room_type: string
           status: Database["public"]["Enums"]["room_status"] | null
           updated_at: string | null
+          waiter_id: string | null
         }
         Insert: {
           capacity: number
@@ -660,6 +661,7 @@ export type Database = {
           room_type: string
           status?: Database["public"]["Enums"]["room_status"] | null
           updated_at?: string | null
+          waiter_id?: string | null
         }
         Update: {
           capacity?: number
@@ -673,8 +675,17 @@ export type Database = {
           room_type?: string
           status?: Database["public"]["Enums"]["room_status"] | null
           updated_at?: string | null
+          waiter_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rooms_waiter_id_fkey"
+            columns: ["waiter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales_items: {
         Row: {
@@ -947,6 +958,45 @@ export type Database = {
           {
             foreignKeyName: "user_roles_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waiter_assignments: {
+        Row: {
+          assigned_at: string | null
+          id: string
+          room_id: string
+          status: string
+          waiter_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          id?: string
+          room_id: string
+          status?: string
+          waiter_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          id?: string
+          room_id?: string
+          status?: string
+          waiter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waiter_assignments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waiter_assignments_waiter_id_fkey"
+            columns: ["waiter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
