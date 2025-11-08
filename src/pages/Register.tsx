@@ -77,23 +77,39 @@ export default function Register() {
         const { error: profileError } = await supabase.from("profiles").insert({
           id: data.user.id,
           full_name: validation.data.fullName,
-          phone: validation.data.phone || null,
+          role: division.toLowerCase(),
+          gender: null,
+          is_busy: false,
         });
 
         if (profileError) {
           console.error("Profile creation error:", profileError);
         }
 
-        // Assign role
+        // Add role if provided
         if (division) {
           const { error: roleError } = await supabase.from("user_roles").insert({
             user_id: data.user.id,
-            role: division.toLowerCase() as any,
+            role: division as any,
           });
 
           if (roleError) {
             console.error("Role creation error:", roleError);
             toast.error("Gagal menambahkan role");
+          }
+
+          // Create employee record if division is provided
+          const employeeId = `EMP-${data.user.id.substring(0, 8).toUpperCase()}`;
+          const { error: empError } = await supabase.from("employees").insert({
+            user_id: data.user.id,
+            employee_id: employeeId,
+            name: validation.data.fullName,
+            division: division,
+            phone: validation.data.phone || null,
+          });
+
+          if (empError) {
+            console.error("Employee creation error:", empError);
           }
         }
 
