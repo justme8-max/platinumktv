@@ -7,7 +7,14 @@ import { LogOut, Music } from "lucide-react";
 import dashboardBg from "@/assets/dashboard-background.svg";
 import employeeBg from "@/assets/employee-background.svg";
 import employeeMobileBg from "@/assets/employee-mobile-background.svg";
+import employeeMobileDarkBg from "@/assets/employee-mobile-dark-background.svg";
+import employeeDashboardLightBg from "@/assets/employee-dashboard-light-background.svg";
+import employeeDashboardDarkBg from "@/assets/employee-dashboard-dark-background.svg";
+import ownerLightBg from "@/assets/owner-light-background.svg";
+import ownerDarkBg from "@/assets/owner-dark-background.svg";
 import ownerBg from "@/assets/owner-background.svg";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -16,6 +23,17 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -23,16 +41,23 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
     navigate("/login");
   };
 
-  // Select background based on role and screen size
+  // Select background based on role, screen size, and theme
   const getBackgroundImage = () => {
-    if (role === 'owner') return ownerBg;
-    if (role === 'waiter' || role === 'cashier' || role === 'accountant' || role === 'manager') return employeeBg;
+    const isDark = theme === 'dark';
+    
+    if (role === 'owner') {
+      if (isMobile) return ownerBg;
+      return isDark ? ownerDarkBg : ownerLightBg;
+    }
+    
+    if (role === 'waiter' || role === 'cashier' || role === 'accountant' || role === 'manager') {
+      if (isMobile) {
+        return isDark ? employeeMobileDarkBg : employeeMobileBg;
+      }
+      return isDark ? employeeDashboardDarkBg : employeeDashboardLightBg;
+    }
+    
     return dashboardBg;
-  };
-
-  const getMobileBackgroundImage = () => {
-    if (role === 'waiter' || role === 'cashier' || role === 'accountant' || role === 'manager') return employeeMobileBg;
-    return getBackgroundImage();
   };
 
   const isEmployee = role === 'waiter' || role === 'cashier' || role === 'accountant' || role === 'manager';
@@ -41,24 +66,13 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
     <div 
       className="min-h-screen bg-background"
       style={{
-        backgroundImage: isEmployee 
-          ? `url(${getMobileBackgroundImage()})` 
-          : `url(${getBackgroundImage()})`,
+        backgroundImage: `url(${getBackgroundImage()})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed'
       }}
     >
-      {isEmployee && (
-        <style>{`
-          @media (min-width: 768px) {
-            .min-h-screen {
-              background-image: url(${employeeBg}) !important;
-            }
-          }
-        `}</style>
-      )}
       <header className="border-b border-border bg-card/95 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
+import TaskManagement from "@/components/tasks/TaskManagement";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import RoomDetailDialog from "./RoomDetailDialog";
@@ -201,6 +203,13 @@ export default function CashierDashboard() {
 
   return (
     <DashboardLayout role="cashier">
+      <Tabs defaultValue="rooms" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="rooms">Ruangan</TabsTrigger>
+          <TabsTrigger value="tasks">Tugas Cleaning</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="rooms" className="space-y-4">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold mb-2">{t('cashier_dashboard.title')}</h2>
@@ -324,6 +333,12 @@ export default function CashierDashboard() {
           setDetailDialogOpen(false);
         }}
       />
+      </TabsContent>
+      
+      <TabsContent value="tasks">
+        <TaskManagement />
+      </TabsContent>
+      </Tabs>
     </DashboardLayout>
   );
 }

@@ -301,6 +301,70 @@ export type Database = {
           },
         ]
       }
+      cleaning_tasks: {
+        Row: {
+          assigned_by: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          priority: string
+          room_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          priority?: string
+          room_id: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_by?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          priority?: string
+          room_id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cleaning_tasks_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cleaning_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cleaning_tasks_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           created_at: string | null
@@ -372,6 +436,102 @@ export type Database = {
           {
             foreignKeyName: "expenses_recorded_by_fkey"
             columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fb_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          product_id: string
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          product_id: string
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fb_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "fb_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fb_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fb_orders: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          room_id: string
+          status: Database["public"]["Enums"]["order_status"]
+          total_amount: number
+          updated_at: string
+          waiter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          room_id: string
+          status?: Database["public"]["Enums"]["order_status"]
+          total_amount?: number
+          updated_at?: string
+          waiter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          room_id?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          total_amount?: number
+          updated_at?: string
+          waiter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fb_orders_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fb_orders_waiter_id_fkey"
+            columns: ["waiter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1054,6 +1214,7 @@ export type Database = {
       approval_status: "pending" | "approved" | "rejected"
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
       movement_type: "purchase" | "sale" | "adjustment" | "return"
+      order_status: "pending" | "preparing" | "ready" | "served" | "cancelled"
       payment_method: "cash" | "card" | "ewallet" | "transfer"
       purchase_status: "pending" | "approved" | "rejected" | "completed"
       recurring_frequency: "weekly" | "monthly"
@@ -1063,6 +1224,7 @@ export type Database = {
         | "maintenance"
         | "reserved"
         | "cleaning"
+      task_status: "pending" | "in_progress" | "completed" | "cancelled"
       transaction_type: "room_rental" | "food_beverage" | "other"
       user_role:
         | "owner"
@@ -1203,6 +1365,7 @@ export const Constants = {
       approval_status: ["pending", "approved", "rejected"],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
       movement_type: ["purchase", "sale", "adjustment", "return"],
+      order_status: ["pending", "preparing", "ready", "served", "cancelled"],
       payment_method: ["cash", "card", "ewallet", "transfer"],
       purchase_status: ["pending", "approved", "rejected", "completed"],
       recurring_frequency: ["weekly", "monthly"],
@@ -1213,6 +1376,7 @@ export const Constants = {
         "reserved",
         "cleaning",
       ],
+      task_status: ["pending", "in_progress", "completed", "cancelled"],
       transaction_type: ["room_rental", "food_beverage", "other"],
       user_role: [
         "owner",

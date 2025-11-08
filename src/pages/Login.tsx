@@ -6,15 +6,29 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import loginMobileLightBg from "@/assets/login-mobile-light-background.svg";
+import loginMobileDarkBg from "@/assets/login-mobile-dark-background.svg";
 import dashboardBg from "@/assets/dashboard-background.svg";
 import { loginSchema } from "@/lib/validation";
 import DemoAccountsDialog from "@/components/auth/DemoAccountsDialog";
+import { useTheme } from "next-themes";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -72,11 +86,18 @@ export default function Login() {
     }
   };
 
+  const getBackgroundImage = () => {
+    if (isMobile) {
+      return theme === 'dark' ? loginMobileDarkBg : loginMobileLightBg;
+    }
+    return dashboardBg;
+  };
+
   return (
     <div 
       className="min-h-screen flex items-center justify-start p-4 md:p-16 relative overflow-y-auto"
       style={{
-        backgroundImage: `url(${dashboardBg})`,
+        backgroundImage: `url(${getBackgroundImage()})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

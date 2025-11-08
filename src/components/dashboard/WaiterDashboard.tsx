@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
+import WaiterPOS from "@/components/waiter/WaiterPOS";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RoomCard from "./RoomCard";
 import QuickActions from "./QuickActions";
 import RoleSpecificWidget from "./RoleSpecificWidget";
@@ -68,8 +70,18 @@ export default function WaiterDashboard() {
   };
 
   return (
-    <>
-      <DashboardLayout role="waiter">
+    <DashboardLayout role="waiter">
+      <Tabs defaultValue="orders" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="orders">F&B Orders</TabsTrigger>
+          <TabsTrigger value="rooms">Ruangan</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="orders">
+          <WaiterPOS />
+        </TabsContent>
+        
+        <TabsContent value="rooms" className="space-y-4">
         <div className="space-y-6">
           <div>
             <h2 className="text-3xl font-bold mb-2">{t("Dashboard Waiter/Waitress", "Waiter/Waitress Dashboard")}</h2>
@@ -130,16 +142,15 @@ export default function WaiterDashboard() {
             )}
           </div>
         </div>
-      </DashboardLayout>
-
-      {selectedRoom && (
+        
         <AddItemsToRoomDialog
+          room={selectedRoom}
           open={addItemsOpen}
           onOpenChange={setAddItemsOpen}
-          room={selectedRoom}
-          onUpdate={loadRooms}
+          onSuccess={loadRooms}
         />
-      )}
-    </>
+        </TabsContent>
+      </Tabs>
+    </DashboardLayout>
   );
 }
