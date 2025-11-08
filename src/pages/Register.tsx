@@ -3,13 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Music, Loader2, ArrowLeft } from "lucide-react";
@@ -29,7 +23,9 @@ export default function Register() {
   // Redirect if already authenticated
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         navigate("/dashboard");
       }
@@ -43,15 +39,15 @@ export default function Register() {
 
     try {
       // Validate input with zod - division is required for all except bitbuddy99@gmail.com
-      const validation = registerSchema.safeParse({ 
-        email, 
-        password, 
-        confirmPassword, 
-        fullName, 
+      const validation = registerSchema.safeParse({
+        email,
+        password,
+        confirmPassword,
+        fullName,
         phone,
-        division: division || undefined // Convert empty string to undefined
+        division: division || undefined, // Convert empty string to undefined
       });
-      
+
       if (!validation.success) {
         const firstError = validation.error.issues[0];
         toast.error(firstError.message);
@@ -70,65 +66,44 @@ export default function Register() {
           data: {
             full_name: validation.data.fullName,
             phone: validation.data.phone,
-          }
-        }
+          },
+        },
       });
 
       if (signUpError) throw signUpError;
 
       if (data.user) {
         // Create profile
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert({
-            id: data.user.id,
-            full_name: validation.data.fullName,
-            email: validation.data.email,
-            phone: validation.data.phone || null,
-          });
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          full_name: validation.data.fullName,
+          phone: validation.data.phone || null,
+        });
 
         if (profileError) {
           console.error("Profile creation error:", profileError);
         }
 
-        // Add role if provided
+        // Assign role
         if (division) {
-          const { error: roleError } = await supabase
-            .from("user_roles")
-            .insert({
-              user_id: data.user.id,
-              role: division as any,
-            });
+          const { error: roleError } = await supabase.from("user_roles").insert({
+            user_id: data.user.id,
+            role: division.toLowerCase() as any,
+          });
 
           if (roleError) {
             console.error("Role creation error:", roleError);
             toast.error("Gagal menambahkan role");
           }
-
-          // Create employee record if division is provided
-          const employeeId = `EMP-${data.user.id.substring(0, 8).toUpperCase()}`;
-          const { error: empError } = await supabase
-            .from("employees")
-            .insert({
-              user_id: data.user.id,
-              employee_id: employeeId,
-              name: validation.data.fullName,
-              division: division,
-              phone: validation.data.phone || null,
-            });
-
-          if (empError) {
-            console.error("Employee creation error:", empError);
-          }
         }
 
         // Send verification email
         try {
-          const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
+          const { error: emailError } = await supabase.functions.invoke("send-verification-email", {
             body: {
               email: validation.data.email,
               fullName: validation.data.fullName,
-            }
+            },
           });
 
           if (emailError) {
@@ -155,10 +130,10 @@ export default function Register() {
   const handleGoogleSignup = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
-        }
+        },
       });
 
       if (error) throw error;
@@ -168,18 +143,18 @@ export default function Register() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4 md:p-16 relative"
       style={{
         backgroundImage: `url(${registerBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       <div className="w-full max-w-md relative z-10 space-y-6 bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl animate-fade-in">
-        <Link 
-          to="/login" 
+        <Link
+          to="/login"
           className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-2"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -193,9 +168,7 @@ export default function Register() {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white tracking-tight">Daftar Akun</h1>
-          <p className="text-base text-white/80">
-            Buat akun baru untuk mengakses sistem
-          </p>
+          <p className="text-base text-white/80">Buat akun baru untuk mengakses sistem</p>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
@@ -294,8 +267,8 @@ export default function Register() {
             />
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full h-11 bg-white/95 text-foreground hover:bg-white rounded-xl font-medium shadow-sm transition-all"
             disabled={loading}
           >
