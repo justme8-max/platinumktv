@@ -147,7 +147,7 @@ export default function WaiterDashboard() {
           room={selectedRoom}
           open={addItemsOpen}
           onOpenChange={setAddItemsOpen}
-          onSuccess={loadRooms}
+          onUpdate={loadRooms}
         />
         </TabsContent>
       </Tabs>
