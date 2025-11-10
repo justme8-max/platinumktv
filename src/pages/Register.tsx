@@ -77,36 +77,20 @@ export default function Register() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Create profile
-        const { error: profileError } = await supabase
-          .from("profiles").insert({
-            id: data.user.id,
-            full_name: validation.data.fullName,
-            role: division.toLowerCase(),
-            is_busy: false,
-            gender: null
+        // Create employee record
+        const employeeId = `EMP-${data.user.id.substring(0, 8).toUpperCase()}`;
+        const { error: empError } = await supabase
+          .from("employees")
+          .insert({
+            user_id: data.user.id,
+            employee_id: employeeId,
+            name: validation.data.fullName,
+            division: division,
+            phone: validation.data.phone || null,
           });
 
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-        }
-
-        
-          // Create employee record if division is provided
-          const employeeId = `EMP-${data.user.id.substring(0, 8).toUpperCase()}`;
-          const { error: empError } = await supabase
-            .from("employees")
-            .insert({
-              user_id: data.user.id,
-              employee_id: employeeId,
-              name: validation.data.fullName,
-              division: division,
-              phone: validation.data.phone || null,
-            });
-
-          if (empError) {
-            console.error("Employee creation error:", empError);
-          }
+        if (empError) {
+          console.error("Employee creation error:", empError);
         }
 
         // Send verification email
