@@ -4,19 +4,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import TaskManagement from "@/components/tasks/TaskManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import StatsCard from "./StatsCard";
 import RoomCard from "./RoomCard";
 import RoomDetailDialog from "./RoomDetailDialog";
 import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
 import ApprovalRequestDialog from "@/components/cashier/ApprovalRequestDialog";
-import QuickActions from "./QuickActions";
-import RoleSpecificWidget from "./RoleSpecificWidget";
-import UpcomingBookingsWidget from "./UpcomingBookingsWidget";
 import PaymentDialog from "./PaymentDialog";
 import ShiftManagementDialog from "@/components/cashier/ShiftManagementDialog";
-import DailyRevenueAnalytics from "./DailyRevenueAnalytics";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Clock, CreditCard, ShoppingCart, Info, PercentSquare, Bell } from "lucide-react";
+import { ShoppingCart, PercentSquare } from "lucide-react";
 import { toast } from "sonner";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
@@ -210,56 +205,23 @@ export default function CashierDashboard() {
         </TabsList>
         
         <TabsContent value="rooms" className="space-y-4">
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold mb-2">{t('cashier_dashboard.title')}</h2>
-          <p className="text-muted-foreground">{t('cashier_dashboard.description')}</p>
+      <div className="space-y-4 md:space-y-6">
+        <div className="px-2 md:px-0">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">{t('cashier_dashboard.title')}</h2>
+          <p className="text-sm md:text-base text-muted-foreground">{t('cashier_dashboard.description')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatsCard
-            title={t('cashier_dashboard.today_transactions')}
-            value={stats.todayTransactions}
-            icon={CreditCard}
-          />
-          <StatsCard
-            title={t('cashier_dashboard.today_revenue')}
-            value={formatIDR(stats.todayRevenue)}
-            icon={DollarSign}
-          />
-          <StatsCard
-            title={t('cashier_dashboard.active_sessions')}
-            value={stats.activeRooms}
-            icon={Clock}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <QuickActions role="cashier" />
-          <div className="lg:col-span-2">
-            <UpcomingBookingsWidget />
-          </div>
-        </div>
-
-        <div>
-          <DailyRevenueAnalytics />
-        </div>
-
-        <div>
-          <RoleSpecificWidget role="cashier" />
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
+        <div className="px-2 md:px-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
               {t('cashier_dashboard.rooms')}
               {rooms.length === 0 && (
-                <span className="text-sm font-normal text-muted-foreground">
+                <span className="text-xs md:text-sm font-normal text-muted-foreground">
                   (Kosong - Gunakan "Demo Data" untuk mengisi)
                 </span>
               )}
             </h3>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <ShiftManagementDialog />
               <DemoDataManager />
               <Button
@@ -270,13 +232,9 @@ export default function CashierDashboard() {
                 <PercentSquare className="h-4 w-4 mr-2" />
                 {t("approval.requestTitle")}
               </Button>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Info className="h-4 w-4" />
-                <p>{t('cashier_dashboard.room_click_hint')}</p>
-              </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
             {rooms.map((room) => (
               <RoomCard
                 key={room.id}
@@ -287,11 +245,11 @@ export default function CashierDashboard() {
           </div>
 
           {rooms.length === 0 && (
-            <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
-              <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">Tidak ada data ruangan</p>
-              <p className="text-sm text-muted-foreground mb-4">
-                Klik tombol "Demo Data" di atas untuk mengisi data demo<br />
+            <div className="col-span-full text-center py-8 md:py-12 bg-muted/30 rounded-lg border-2 border-dashed mx-2 md:mx-0">
+              <ShoppingCart className="h-10 w-10 md:h-12 md:w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-base md:text-lg font-medium mb-2">Tidak ada data ruangan</p>
+              <p className="text-xs md:text-sm text-muted-foreground mb-4 px-4">
+                Klik tombol "Demo Data" di atas untuk mengisi data demo<br className="hidden md:block" />
                 (Login sebagai Owner/Manager untuk seed demo data)
               </p>
             </div>

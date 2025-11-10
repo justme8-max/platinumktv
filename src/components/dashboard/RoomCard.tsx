@@ -104,65 +104,65 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
         onClick={onClick}
       >
         {/* Dark Header */}
-        <div className="bg-[#3d3d3d] text-white p-4 flex items-center justify-between">
-          <h3 className="font-bold text-lg">
+        <div className="bg-[hsl(0,0%,24%)] text-white p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <h3 className="font-bold text-base md:text-lg">
             {room.room_name}
           </h3>
           
           {/* Timer Display */}
-          <div className="flex items-center gap-2">
-            <Timer className="h-5 w-5" />
-            <span className="font-mono text-sm tracking-wider">
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <Timer className="h-4 w-4 md:h-5 md:w-5" />
+            <span className="font-mono text-xs md:text-sm tracking-wider">
               {timeRemaining || "00 : 00 : 00"}
             </span>
           </div>
 
           {/* Status Badge */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{statusInfo.label}</span>
-            <div className={cn("h-3 w-3 rounded-full", statusInfo.dot)} />
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <span className="text-xs md:text-sm font-medium">{statusInfo.label}</span>
+            <div className={cn("h-2.5 w-2.5 md:h-3 md:w-3 rounded-full", statusInfo.dot)} />
           </div>
         </div>
 
         {/* Main Content Area */}
         <div className="relative">
-          <CardContent className="p-6 bg-gradient-to-br from-muted/30 to-muted/10 min-h-[180px]">
-            <div className="space-y-3">
+          <CardContent className="p-4 md:p-6 bg-gradient-to-br from-muted/30 to-muted/10 min-h-[160px] md:min-h-[180px]">
+            <div className="space-y-2 md:space-y-3">
               {/* Room Details */}
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span className="text-sm">{t('room_card.guests', { count: room.capacity })}</span>
+              <div className="flex items-center gap-1.5 md:gap-2 text-muted-foreground flex-wrap">
+                <Users className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                <span className="text-xs md:text-sm">{t('room_card.guests', { count: room.capacity })}</span>
                 <span className="text-muted-foreground">•</span>
-                <span className="capitalize text-sm">{room.room_type}</span>
+                <span className="capitalize text-xs md:text-sm">{room.room_type}</span>
               </div>
 
               {/* Room Number */}
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs md:text-sm text-muted-foreground">
                 {t('room_card.room')} {room.room_number}
               </div>
 
               {/* Waiter Assignment */}
               {waiterName && (
                 <div className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-md text-sm",
+                  "flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm",
                   waiterBusy 
                     ? "bg-destructive/20 text-destructive-foreground" 
                     : "bg-success/20 text-success-foreground"
                 )}>
-                  <UserCircle className="h-4 w-4" />
-                  <span>{waiterName}</span>
+                  <UserCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <span className="truncate">{waiterName}</span>
                   <span className={cn(
-                    "ml-auto text-xs px-2 py-0.5 rounded-full",
+                    "ml-auto text-xs px-1.5 md:px-2 py-0.5 rounded-full whitespace-nowrap",
                     waiterBusy ? "bg-destructive text-destructive-foreground" : "bg-success text-success-foreground"
                   )}>
-                    {waiterBusy ? "Sibuk" : "Free"}
+                    {waiterBusy ? "Sibuk" : "Tersedia"}
                   </span>
                 </div>
               )}
 
               {/* Price */}
-              <div className="flex items-center justify-between pt-2 border-t">
-                <div className="font-bold text-lg text-foreground">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <div className="font-bold text-base md:text-lg text-foreground">
                   {formatIDR(room.hourly_rate)}/{t('room_card.hour')}
                 </div>
               </div>
@@ -180,20 +180,20 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
           </CardContent>
 
           {/* Action Buttons - Right Side */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3">
+          <div className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3">
             <Button
               size="icon"
-              className="h-12 w-12 rounded-full bg-destructive hover:bg-destructive/90 shadow-lg"
+              className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-destructive hover:bg-destructive/90 shadow-lg"
               onClick={onClick}
             >
-              <Clock className="h-5 w-5" />
+              <Clock className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
             <Button
               size="icon"
-              className="h-12 w-12 rounded-full bg-destructive hover:bg-destructive/90 shadow-lg"
+              className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-destructive hover:bg-destructive/90 shadow-lg"
               onClick={handleInfoClick}
             >
-              <Receipt className="h-5 w-5" />
+              <Receipt className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
           </div>
         </div>
