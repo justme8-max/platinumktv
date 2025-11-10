@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,74 @@ export default function Register() {
   const [division, setDivision] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const autosaveTimerRef = useRef<NodeJS.Timeout>();
+
+  // Autosave to Supabase with debouncing
+  const autosaveDraft = useCallback(async () => {
+    if (!email || !fullName) return;
+
+    try {
+      const { error } = await supabase
+        .from("draft_registrations")
+        .upsert({
+          email,
+          full_name: fullName,
+          phone: phone || null,
+          division: division || null,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'email'
+        });
+
+      if (error && error.code !== '23505') {
+        console.error("Autosave error:", error);
+      }
+    } catch (error) {
+      console.error("Autosave failed:", error);
+    }
+  }, [email, fullName, phone, division]);
+
+  // Debounced autosave effect
+  useEffect(() => {
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+
+    if (email && fullName) {
+      autosaveTimerRef.current = setTimeout(() => {
+        autosaveDraft();
+      }, 1000); // Save after 1 second of inactivity
+    }
+
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+    };
+  }, [email, fullName, phone, division, autosaveDraft]);
+
+  // Load draft data on mount
+  useEffect(() => {
+    const loadDraft = async () => {
+      const savedEmail = localStorage.getItem('draft_email');
+      if (savedEmail) {
+        const { data, error } = await supabase
+          .from("draft_registrations")
+          .select("*")
+          .eq('email', savedEmail)
+          .single();
+
+        if (data && !error) {
+          setEmail(data.email);
+          setFullName(data.full_name || "");
+          setPhone(data.phone || "");
+          setDivision(data.division || "");
+          toast.info("Data sebelumnya dimuat");
+        }
+      }
+    };
+    loadDraft();
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -108,6 +176,13 @@ export default function Register() {
         } catch (emailError) {
           console.error("Failed to send verification email:", emailError);
         }
+
+        // Clear draft data after successful registration
+        await supabase
+          .from("draft_registrations")
+          .delete()
+          .eq('email', validation.data.email);
+        localStorage.removeItem('draft_email');
 
         toast.success("Pendaftaran berhasil! Email verifikasi telah dikirim.");
         navigate("/login");
@@ -194,7 +269,13 @@ export default function Register() {
               type="email"
               placeholder="your@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                const newEmail = e.target.value;
+                setEmail(newEmail);
+                if (newEmail) {
+                  localStorage.setItem('draft_email', newEmail);
+                }
+              }}
               required
               className="h-11 bg-white/95 border-0 rounded-xl text-base shadow-sm focus-visible:ring-1"
             />
