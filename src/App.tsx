@@ -17,6 +17,8 @@ import RecurringBookings from "./pages/RecurringBookings";
 import Analytics from "./pages/Analytics";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
+import CashierRoomDetail from "./pages/cashier/RoomDetail";
+import WaiterRoomDetail from "./pages/waiter/RoomDetail";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +61,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/cashier/room/:roomId" element={<CashierRoomDetail />} />
+            <Route path="/waiter/room/:roomId" element={<WaiterRoomDetail />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/recurring-bookings" element={<RecurringBookings />} />
             <Route path="/analytics" element={<Analytics />} />

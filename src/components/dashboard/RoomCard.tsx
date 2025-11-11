@@ -9,6 +9,7 @@ import { useRoomTimer } from "@/hooks/useRoomTimer";
 import { useState, useEffect } from "react";
 import RoomTransactionHistory from "./RoomTransactionHistory";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface Room {
   id: string;
@@ -33,6 +34,26 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [waiterName, setWaiterName] = useState<string | null>(null);
   const [waiterBusy, setWaiterBusy] = useState(false);
+  const [userRole, setUserRole] = useState<string>("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .single();
+        if (data) {
+          const storedRole = sessionStorage.getItem('selectedRole');
+          setUserRole(storedRole || data.role);
+        }
+      }
+    };
+    getUserRole();
+  }, []);
 
   useEffect(() => {
     const fetchWaiterInfo = async () => {
@@ -97,11 +118,20 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
     setHistoryOpen(true);
   };
 
+  const handleCardClick = () => {
+    if (room.status === "occupied" && (userRole === "cashier" || userRole === "waiter")) {
+      const route = userRole === "cashier" ? `/cashier/room/${room.id}` : `/waiter/room/${room.id}`;
+      navigate(route);
+    } else {
+      onClick?.();
+    }
+  };
+
   return (
     <>
       <Card 
         className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 relative overflow-hidden rounded-xl bg-white/80 backdrop-blur border border-border"
-        onClick={onClick}
+        onClick={handleCardClick}
       >
         {/* Header - Secondary Color */}
         <div className="bg-secondary text-secondary-foreground p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
