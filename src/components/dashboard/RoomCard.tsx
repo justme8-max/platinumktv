@@ -66,12 +66,12 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
     available: {
       badge: "bg-success text-success-foreground",
       dot: "bg-success",
-      label: "Ready",
+      label: "Tersedia",
     },
     occupied: {
       badge: "bg-destructive text-destructive-foreground",
       dot: "bg-destructive",
-      label: "Occupied",
+      label: "Terisi",
     },
     maintenance: {
       badge: "bg-warning text-warning-foreground",
@@ -79,13 +79,13 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
       label: "Maintenance",
     },
     reserved: {
-      badge: "bg-[hsl(var(--gold))] text-[hsl(var(--gold-foreground))]",
-      dot: "bg-[hsl(var(--gold))]",
+      badge: "bg-primary text-primary-foreground",
+      dot: "bg-primary",
       label: "Reserved",
     },
     cleaning: {
-      badge: "bg-[hsl(var(--platinum))] text-[hsl(var(--platinum-foreground))]",
-      dot: "bg-[hsl(var(--platinum))]",
+      badge: "bg-muted text-muted-foreground",
+      dot: "bg-muted-foreground",
       label: "Cleaning",
     },
   };
@@ -100,12 +100,12 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
   return (
     <>
       <Card 
-        className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 relative overflow-hidden border-2"
+        className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 relative overflow-hidden rounded-xl bg-white/80 backdrop-blur border border-border"
         onClick={onClick}
       >
-        {/* Dark Header */}
-        <div className="bg-[hsl(0,0%,24%)] text-white p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <h3 className="font-bold text-base md:text-lg">
+        {/* Header - Secondary Color */}
+        <div className="bg-secondary text-secondary-foreground p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <h3 className="font-semibold text-base md:text-lg tracking-wide">
             {room.room_name}
           </h3>
           
@@ -119,7 +119,7 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
 
           {/* Status Badge */}
           <div className="flex items-center gap-1.5 md:gap-2">
-            <span className="text-xs md:text-sm font-medium">{statusInfo.label}</span>
+            <span className="text-xs md:text-sm font-semibold tracking-wide">{statusInfo.label}</span>
             <div className={cn("h-2.5 w-2.5 md:h-3 md:w-3 rounded-full", statusInfo.dot)} />
           </div>
         </div>
@@ -161,8 +161,8 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
               )}
 
               {/* Price */}
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <div className="font-bold text-base md:text-lg text-foreground">
+              <div className="flex items-center justify-between pt-2 border-t border-primary/20">
+                <div className="font-semibold text-base md:text-lg text-primary tracking-wide">
                   {formatIDR(room.hourly_rate)}/{t('room_card.hour')}
                 </div>
               </div>
@@ -183,14 +183,14 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
           <div className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3">
             <Button
               size="icon"
-              className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-destructive hover:bg-destructive/90 shadow-lg"
+              className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all hover:shadow-glow"
               onClick={onClick}
             >
               <Clock className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
             <Button
               size="icon"
-              className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-destructive hover:bg-destructive/90 shadow-lg"
+              className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg transition-all"
               onClick={handleInfoClick}
             >
               <Receipt className="h-4 w-4 md:h-5 md:w-5" />
