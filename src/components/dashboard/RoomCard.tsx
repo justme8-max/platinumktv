@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import RoomTransactionHistory from "./RoomTransactionHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface Room {
   id: string;
@@ -34,26 +35,8 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [waiterName, setWaiterName] = useState<string | null>(null);
   const [waiterBusy, setWaiterBusy] = useState(false);
-  const [userRole, setUserRole] = useState<string>("");
+  const { data: userRole } = useUserRole();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const getUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
-        if (data) {
-          const storedRole = sessionStorage.getItem('selectedRole');
-          setUserRole(storedRole || data.role);
-        }
-      }
-    };
-    getUserRole();
-  }, []);
 
   useEffect(() => {
     const fetchWaiterInfo = async () => {

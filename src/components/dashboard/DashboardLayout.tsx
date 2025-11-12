@@ -15,6 +15,7 @@ import ownerDarkBg from "@/assets/owner-dark-background.svg";
 import ownerBg from "@/assets/owner-background.svg";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
+import { NotificationCenter } from "@/components/common/NotificationCenter";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -84,7 +85,9 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
               <p className="text-xs text-muted-foreground capitalize font-semibold">{role === "cashier" ? "Kasir" : role === "waiter" ? "Pelayan" : role === "manager" ? "Manajer" : role === "owner" ? "Pemilik" : role} Dashboard</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
+          <div className="flex items-center gap-2">
+            <NotificationCenter />
+            <Button variant="outline" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Keluar
           </Button>

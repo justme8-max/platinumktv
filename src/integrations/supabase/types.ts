@@ -77,6 +77,42 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       booking_reminders: {
         Row: {
           booking_id: string
@@ -568,6 +604,39 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          link: string | null
+          message: string
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message: string
+          title: string
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          link?: string | null
+          message?: string
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category_id: string | null
@@ -924,6 +993,7 @@ export type Database = {
       }
       shifts: {
         Row: {
+          cash_difference: number | null
           closing_balance: number | null
           created_at: string
           end_time: string | null
@@ -934,13 +1004,16 @@ export type Database = {
           status: string
           total_card: number | null
           total_cash: number | null
+          total_discount: number | null
           total_ewallet: number | null
+          total_sales: number | null
           total_transactions: number | null
           total_transfer: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          cash_difference?: number | null
           closing_balance?: number | null
           created_at?: string
           end_time?: string | null
@@ -951,13 +1024,16 @@ export type Database = {
           status?: string
           total_card?: number | null
           total_cash?: number | null
+          total_discount?: number | null
           total_ewallet?: number | null
+          total_sales?: number | null
           total_transactions?: number | null
           total_transfer?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          cash_difference?: number | null
           closing_balance?: number | null
           created_at?: string
           end_time?: string | null
@@ -968,7 +1044,9 @@ export type Database = {
           status?: string
           total_card?: number | null
           total_cash?: number | null
+          total_discount?: number | null
           total_ewallet?: number | null
+          total_sales?: number | null
           total_transactions?: number | null
           total_transfer?: number | null
           updated_at?: string
@@ -1063,6 +1141,7 @@ export type Database = {
           final_amount: number | null
           id: string
           payment_method: Database["public"]["Enums"]["payment_method"]
+          receipt_number: string | null
           room_id: string | null
           service_charge: number | null
           session_end: string | null
@@ -1081,6 +1160,7 @@ export type Database = {
           final_amount?: number | null
           id?: string
           payment_method: Database["public"]["Enums"]["payment_method"]
+          receipt_number?: string | null
           room_id?: string | null
           service_charge?: number | null
           session_end?: string | null
@@ -1099,6 +1179,7 @@ export type Database = {
           final_amount?: number | null
           id?: string
           payment_method?: Database["public"]["Enums"]["payment_method"]
+          receipt_number?: string | null
           room_id?: string | null
           service_charge?: number | null
           session_end?: string | null
@@ -1230,6 +1311,7 @@ export type Database = {
         Args: { emp_division: string; emp_name: string }
         Returns: string
       }
+      generate_receipt_number: { Args: never; Returns: string }
       has_management_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -1237,6 +1319,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      send_notification: {
+        Args: {
+          p_link?: string
+          p_message: string
+          p_title: string
+          p_type?: string
+          p_user_id: string
+        }
+        Returns: string
       }
     }
     Enums: {
