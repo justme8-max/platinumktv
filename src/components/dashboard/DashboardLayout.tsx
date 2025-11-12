@@ -88,9 +88,10 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
           <div className="flex items-center gap-2">
             <NotificationCenter />
             <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Keluar
-          </Button>
+              <LogOut className="h-4 w-4 mr-2" />
+              Keluar
+            </Button>
+          </div>
         </div>
       </header>
       <main className="container mx-auto px-4 py-6">
