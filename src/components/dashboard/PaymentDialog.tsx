@@ -34,11 +34,27 @@ interface Room {
   current_session_start: string | null;
 }
 
+interface ReceiptData {
+  roomName: string;
+  roomNumber: string;
+  receiptNumber: string;
+  date: string;
+  cashier: string;
+  items: any[];
+  roomCost: number;
+  durationHours: number;
+  subtotal: number;
+  serviceCharge: number;
+  taxAmount: number;
+  totalAmount: number;
+  paymentMethod: string;
+}
+
 interface PaymentDialogProps {
   room: Room | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (receiptData: ReceiptData) => void;
 }
 
 type PaymentMethod = "cash" | "card" | "transfer" | "ewallet";
@@ -133,8 +149,26 @@ export default function PaymentDialog({
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Create transaction
-      const { error: transactionError } = await supabase
+      // Get user profile for cashier name
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user?.id)
+        .single();
+
+      // Get ordered items
+      const { data: orderedItems } = await supabase
+        .from("fb_order_items")
+        .select(`
+          quantity,
+          unit_price,
+          subtotal,
+          products (name_id, name_en)
+        `)
+        .eq("order_id", room.id);
+
+      // Create transaction and get the generated receipt number
+      const { data: transactionData, error: transactionError } = await supabase
         .from("transactions")
         .insert({
           room_id: room.id,
@@ -151,7 +185,9 @@ export default function PaymentDialog({
           session_end: new Date().toISOString(),
           duration_hours: amounts.durationHours,
           description: `${room.room_name} - ${amounts.durationHours} hours`,
-        });
+        })
+        .select()
+        .single();
 
       if (transactionError) throw transactionError;
 
@@ -166,22 +202,30 @@ export default function PaymentDialog({
 
       if (roomError) throw roomError;
 
-      toast.success(
-        <>
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span className="font-semibold">Payment Successful!</span>
-          </div>
-          <div className="text-sm space-y-1">
-            <div>Room: {room.room_name}</div>
-            <div>Amount: {formatIDR(amounts.finalAmount)}</div>
-            <div>Method: {paymentMethod.toUpperCase()}</div>
-          </div>
-        </>,
-        { duration: 5000 }
-      );
+      // Prepare receipt data
+      const receiptData: ReceiptData = {
+        roomName: room.room_name,
+        roomNumber: room.room_number,
+        receiptNumber: transactionData.receipt_number || 'N/A',
+        date: new Date().toLocaleString('id-ID'),
+        cashier: profile?.full_name || 'Cashier',
+        items: orderedItems?.map(item => ({
+          name: item.products?.name_id || item.products?.name_en || '',
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          subtotal: item.subtotal,
+        })) || [],
+        roomCost: amounts.roomCost,
+        durationHours: amounts.durationHours,
+        subtotal: amounts.subtotal,
+        serviceCharge: amounts.serviceCharge,
+        taxAmount: amounts.taxAmount,
+        totalAmount: amounts.finalAmount,
+        paymentMethod: paymentMethod,
+      };
 
-      onSuccess();
+      toast.success("Payment processed successfully!");
+      onSuccess(receiptData);
       onOpenChange(false);
     } catch (error: any) {
       toast.error(`Payment failed: ${error.message}`);

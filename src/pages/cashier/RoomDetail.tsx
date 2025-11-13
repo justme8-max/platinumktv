@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Plus, CreditCard } from "lucide-react";
+import { ArrowLeft, Plus, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import PaymentDialog from "@/components/dashboard/PaymentDialog";
-import AddItemsToRoomDialog from "@/components/dashboard/AddItemsToRoomDialog";
 import { formatIDR } from "@/lib/currency";
+
+// Lazy load heavy components
+const PaymentDialog = lazy(() => import("@/components/dashboard/PaymentDialog"));
+const AddItemsToRoomDialog = lazy(() => import("@/components/dashboard/AddItemsToRoomDialog"));
+const ReceiptPreviewDialog = lazy(() => import("@/components/cashier/ReceiptPreviewDialog"));
 
 export default function CashierRoomDetail() {
   const { roomId } = useParams();
@@ -19,6 +22,8 @@ export default function CashierRoomDetail() {
   const [loading, setLoading] = useState(true);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [addItemsOpen, setAddItemsOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receiptData, setReceiptData] = useState<any>(null);
   const [duration, setDuration] = useState<string>("");
   const [estimatedCost, setEstimatedCost] = useState<number>(0);
 
@@ -91,9 +96,14 @@ export default function CashierRoomDetail() {
     setPaymentOpen(true);
   };
 
-  const handlePaymentComplete = () => {
-    toast.success("Pembayaran berhasil");
+  const handlePaymentComplete = (receipt: any) => {
+    setReceiptData(receipt);
     setPaymentOpen(false);
+    setReceiptOpen(true);
+  };
+
+  const handleReceiptClose = () => {
+    setReceiptOpen(false);
     navigate("/dashboard");
   };
 
@@ -217,7 +227,7 @@ export default function CashierRoomDetail() {
       </div>
 
       {room && (
-        <>
+        <Suspense fallback={<div className="flex items-center justify-center p-4"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
           <PaymentDialog
             room={room}
             open={paymentOpen}
@@ -230,7 +240,12 @@ export default function CashierRoomDetail() {
             onOpenChange={setAddItemsOpen}
             onUpdate={loadRoomData}
           />
-        </>
+          <ReceiptPreviewDialog
+            open={receiptOpen}
+            onOpenChange={handleReceiptClose}
+            receiptData={receiptData}
+          />
+        </Suspense>
       )}
     </DashboardLayout>
   );
