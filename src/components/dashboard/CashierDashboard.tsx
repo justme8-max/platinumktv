@@ -10,6 +10,7 @@ import AddItemsToRoomDialog from "./AddItemsToRoomDialog";
 import ApprovalRequestDialog from "@/components/cashier/ApprovalRequestDialog";
 import PaymentDialog from "./PaymentDialog";
 import ShiftManagementDialog from "@/components/cashier/ShiftManagementDialog";
+import CashDrawerManagement from "@/components/cashier/CashDrawerManagement";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, PercentSquare } from "lucide-react";
 import { toast } from "sonner";
@@ -201,6 +202,7 @@ export default function CashierDashboard() {
       <Tabs defaultValue="rooms" className="space-y-4">
         <TabsList>
           <TabsTrigger value="rooms">Ruangan</TabsTrigger>
+          <TabsTrigger value="cash">Laci Kas</TabsTrigger>
           <TabsTrigger value="tasks">Tugas Cleaning</TabsTrigger>
         </TabsList>
         
@@ -291,6 +293,10 @@ export default function CashierDashboard() {
           setDetailDialogOpen(false);
         }}
       />
+      </TabsContent>
+      
+      <TabsContent value="cash" className="max-w-2xl mx-auto">
+        <CashDrawerManagement />
       </TabsContent>
       
       <TabsContent value="tasks">

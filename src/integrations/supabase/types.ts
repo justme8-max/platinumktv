@@ -210,6 +210,89 @@ export type Database = {
           },
         ]
       }
+      cash_drawer_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          drawer_id: string
+          id: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          drawer_id: string
+          id?: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          drawer_id?: string
+          id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_drawer_transactions_drawer_id_fkey"
+            columns: ["drawer_id"]
+            isOneToOne: false
+            referencedRelation: "cash_drawers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cash_drawers: {
+        Row: {
+          cash_difference: number | null
+          closed_at: string | null
+          closing_balance: number | null
+          created_at: string
+          current_balance: number
+          id: string
+          opened_at: string
+          opening_balance: number
+          status: string
+          total_cash_in: number
+          total_cash_out: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cash_difference?: number | null
+          closed_at?: string | null
+          closing_balance?: number | null
+          created_at?: string
+          current_balance?: number
+          id?: string
+          opened_at?: string
+          opening_balance?: number
+          status?: string
+          total_cash_in?: number
+          total_cash_out?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cash_difference?: number | null
+          closed_at?: string | null
+          closing_balance?: number | null
+          created_at?: string
+          current_balance?: number
+          id?: string
+          opened_at?: string
+          opening_balance?: number
+          status?: string
+          total_cash_in?: number
+          total_cash_out?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null
