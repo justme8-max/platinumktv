@@ -3,68 +3,96 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
-import { ShoppingCart, Clock, Package, Zap } from "lucide-react";
+import { ShoppingCart, Clock, Package, Plus, List, MessageSquare } from "lucide-react";
 import WaiterTaskHistory from "@/components/waiter/WaiterTaskHistory";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StaggeredGrid } from "@/components/ui/staggered-grid";
-import { Button } from "@/components/ui/button";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { FloatingActionButton } from "@/components/ui/floating-action-button";
+import { toast } from "sonner";
+import RoomCard from "./RoomCard";
 
-const ExpandableRoomCard = lazy(() => import("@/components/waiter/ExpandableRoomCard"));
 const WaiterRoomDetailCard = lazy(() => import("@/components/waiter/WaiterRoomDetailCard"));
-const QuickActionsSheet = lazy(() => import("@/components/waiter/QuickActionsSheet"));
 
 export default function WaiterDashboard() {
   const { t } = useLanguage();
   const [rooms, setRooms] = useState<any[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     activeOrders: 0,
     occupiedRooms: 0,
     pendingItems: 0,
   });
 
+  const pullToRefresh = usePullToRefresh({
+    onRefresh: async () => {
+      await loadRooms();
+      toast.success("Data diperbarui");
+    },
+  });
+
   useEffect(() => {
     loadRooms();
 
-    const channel = supabase
-      .channel('rooms-waiter')
+    // Real-time subscriptions for rooms and orders
+    const roomsChannel = supabase
+      .channel('rooms-waiter-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => {
         loadRooms();
       })
       .subscribe();
 
+    const ordersChannel = supabase
+      .channel('orders-waiter-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'fb_orders' }, (payload) => {
+        console.log('Order update:', payload);
+        loadRooms();
+        toast.info("Pesanan diperbarui");
+      })
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(roomsChannel);
+      supabase.removeChannel(ordersChannel);
     };
   }, []);
 
   const loadRooms = async () => {
-    const { data } = await supabase
-      .from("rooms")
-      .select("*")
-      .order("room_number");
+    try {
+      setLoading(true);
+      const { data } = await supabase
+        .from("rooms")
+        .select("*")
+        .order("room_number");
 
-    setRooms(data || []);
+      setRooms(data || []);
 
-    // Calculate stats
-    const occupied = data?.filter(r => r.status === "occupied").length || 0;
-    
-    // Get today's sales items count
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const { data: salesData } = await supabase
-      .from("sales_items")
-      .select("*")
-      .gte("created_at", today.toISOString());
-    
-    setStats({
-      activeOrders: salesData?.length || 0,
-      occupiedRooms: occupied,
-      pendingItems: salesData?.length || 0,
-    });
+      // Calculate stats
+      const occupied = data?.filter(r => r.status === "occupied").length || 0;
+      
+      // Get active orders count
+      const { data: ordersData } = await supabase
+        .from("fb_orders")
+        .select("id, fb_order_items(id)")
+        .in("status", ["pending", "preparing"]);
+      
+      const totalItems = ordersData?.reduce((sum, order) => 
+        sum + (order.fb_order_items?.length || 0), 0) || 0;
+      
+      setStats({
+        activeOrders: ordersData?.length || 0,
+        occupiedRooms: occupied,
+        pendingItems: totalItems,
+      });
+    } catch (error) {
+      console.error("Error loading rooms:", error);
+      toast.error("Gagal memuat data");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRoomClick = (room: any) => {
@@ -72,98 +100,128 @@ export default function WaiterDashboard() {
     setDetailOpen(true);
   };
 
+  const fabActions = [
+    {
+      icon: <Plus className="h-5 w-5" />,
+      label: "Tambah Pesanan",
+      onClick: () => {
+        const occupiedRoom = rooms.find(r => r.status === "occupied");
+        if (occupiedRoom) {
+          handleRoomClick(occupiedRoom);
+        } else {
+          toast.error("Tidak ada ruangan terisi");
+        }
+      },
+    },
+    {
+      icon: <List className="h-5 w-5" />,
+      label: "Lihat Semua",
+      onClick: () => {
+        toast.info("Menampilkan semua ruangan");
+      },
+    },
+    {
+      icon: <MessageSquare className="h-5 w-5" />,
+      label: "Chat Tim",
+      onClick: () => {
+        toast.info("Fitur chat segera hadir");
+      },
+    },
+  ];
+
   return (
     <DashboardLayout role="waiter">
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold mb-2">Dashboard Waiter</h2>
-          <p className="text-muted-foreground">Kelola pesanan dan tugas ruangan</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatsCard
-            title="Pesanan Aktif"
-            value={stats.activeOrders}
-            icon={ShoppingCart}
-          />
-          <StatsCard
-            title="Ruangan Terisi"
-            value={stats.occupiedRooms}
-            icon={Clock}
-          />
-          <StatsCard
-            title="Item Dipesan"
-            value={stats.pendingItems}
-            icon={Package}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Room Cards */}
-          <div className="lg:col-span-3 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-semibold">Ruangan</h3>
-              <Button
-                size="sm"
-                onClick={() => setQuickActionsOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <Zap className="w-4 h-4" />
-                <span className="hidden sm:inline">Aksi Cepat</span>
-              </Button>
+      <div ref={pullToRefresh.containerRef} className="h-full overflow-auto">
+        <PullToRefresh
+          isPulling={pullToRefresh.isPulling}
+          isRefreshing={pullToRefresh.isRefreshing}
+          pullDistance={pullToRefresh.pullDistance}
+          shouldRefresh={pullToRefresh.shouldRefresh}
+        >
+          <div className="space-y-6 p-4 md:p-6">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Dashboard Waiter</h2>
+              <p className="text-muted-foreground">Kelola pesanan dan tugas ruangan</p>
             </div>
 
-            {rooms.length > 0 ? (
-              <StaggeredGrid
-                columns={{ default: 1, md: 2, xl: 3 }}
-                className="grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
-              >
-                {rooms.map((room) => (
-                  <Suspense 
-                    key={room.id} 
-                    fallback={<Skeleton className="h-48 rounded-xl" />}
-                  >
-                    <ExpandableRoomCard
-                      room={room}
-                      onAddItems={() => handleRoomClick(room)}
-                      onExtendTime={() => handleRoomClick(room)}
-                    />
-                  </Suspense>
-                ))}
-              </StaggeredGrid>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+              </div>
             ) : (
-              <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
-                <p className="text-lg font-medium mb-2">Tidak ada ruangan tersedia</p>
-                <p className="text-sm text-muted-foreground">
-                  Hubungi manager untuk membuat ruangan baru
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatsCard
+                  title="Pesanan Aktif"
+                  value={stats.activeOrders}
+                  icon={ShoppingCart}
+                />
+                <StatsCard
+                  title="Ruangan Terisi"
+                  value={stats.occupiedRooms}
+                  icon={Clock}
+                />
+                <StatsCard
+                  title="Item Dipesan"
+                  value={stats.pendingItems}
+                  icon={Package}
+                />
               </div>
             )}
-          </div>
 
-          {/* Task History */}
-          <div className="lg:col-span-1">
-            <WaiterTaskHistory />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-3 space-y-4">
+                <h3 className="text-xl font-semibold">Ruangan</h3>
+
+                {loading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-48 rounded-xl" />
+                    ))}
+                  </div>
+                ) : rooms.length > 0 ? (
+                  <StaggeredGrid
+                    columns={{ default: 1, md: 2, xl: 3 }}
+                    className="grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+                  >
+                    {rooms.map((room) => (
+                      <RoomCard
+                        key={room.id}
+                        room={room}
+                        onClick={() => handleRoomClick(room)}
+                      />
+                    ))}
+                  </StaggeredGrid>
+                ) : (
+                  <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
+                    <p className="text-lg font-medium mb-2">Tidak ada ruangan tersedia</p>
+                    <p className="text-sm text-muted-foreground">
+                      Hubungi manager untuk membuat ruangan baru
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:col-span-1">
+                <WaiterTaskHistory />
+              </div>
+            </div>
           </div>
-        </div>
+        </PullToRefresh>
       </div>
+
+      <FloatingActionButton
+        icon={<Plus className="h-6 w-6" />}
+        actions={fabActions}
+        position="bottom-right"
+      />
       
       <Suspense fallback={<Skeleton className="h-[600px]" />}>
         <WaiterRoomDetailCard
           room={selectedRoom}
           open={detailOpen}
           onOpenChange={setDetailOpen}
-        />
-      </Suspense>
-
-      <Suspense fallback={null}>
-        <QuickActionsSheet
-          open={quickActionsOpen}
-          onOpenChange={setQuickActionsOpen}
-          onAddOrder={() => {
-            const occupiedRoom = rooms.find(r => r.status === "occupied");
-            if (occupiedRoom) handleRoomClick(occupiedRoom);
-          }}
         />
       </Suspense>
     </DashboardLayout>
