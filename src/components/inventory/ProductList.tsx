@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { StaggeredGrid } from "@/components/ui/staggered-grid";
 
 interface Product {
   id: string;
@@ -74,7 +75,7 @@ export default function ProductList({ onAdd, onEdit }: { onAdd: () => void; onEd
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <StaggeredGrid columns={{ default: 1, md: 2, lg: 3 }} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => {
           const isLowStock = product.stock_quantity <= product.min_stock_level;
           
@@ -115,7 +116,7 @@ export default function ProductList({ onAdd, onEdit }: { onAdd: () => void; onEd
             </Card>
           );
         })}
-      </div>
+      </StaggeredGrid>
     </div>
   );
 }
