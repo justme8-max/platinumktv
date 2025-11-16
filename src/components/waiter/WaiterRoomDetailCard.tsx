@@ -298,19 +298,20 @@ export default function WaiterRoomDetailCard({ room, open, onOpenChange }: Waite
                   ) : (
                     <div className="space-y-2">
                       {orderItems.map((item) => (
-                        <div key={item.id} className="flex justify-between items-center text-sm p-2 border rounded">
-                          <div>
-                            <p className="font-medium">{item.products.name_id}</p>
+                        <div key={item.id} className="flex justify-between items-center gap-2 text-sm p-3 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{item.products.name_id}</p>
                             <p className="text-xs text-muted-foreground">
-                              {item.quantity} x {formatIDR(item.unit_price)}
+                              {item.quantity} x {formatIDR(item.unit_price)} = {formatIDR(item.quantity * item.unit_price)}
                             </p>
                           </div>
                           <Button
-                            size="sm"
+                            size="icon"
                             variant="ghost"
+                            className="h-8 w-8 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => handleDeleteItem(item.id, item.order_id)}
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       ))}

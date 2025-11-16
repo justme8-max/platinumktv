@@ -2,19 +2,23 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import DashboardLayout from "./DashboardLayout";
-import RoomCard from "./RoomCard";
 import StatsCard from "./StatsCard";
-import { ShoppingCart, Clock, Package } from "lucide-react";
+import { ShoppingCart, Clock, Package, Zap } from "lucide-react";
 import WaiterTaskHistory from "@/components/waiter/WaiterTaskHistory";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StaggeredGrid } from "@/components/ui/staggered-grid";
+import { Button } from "@/components/ui/button";
 
+const ExpandableRoomCard = lazy(() => import("@/components/waiter/ExpandableRoomCard"));
 const WaiterRoomDetailCard = lazy(() => import("@/components/waiter/WaiterRoomDetailCard"));
+const QuickActionsSheet = lazy(() => import("@/components/waiter/QuickActionsSheet"));
 
 export default function WaiterDashboard() {
   const { t } = useLanguage();
   const [rooms, setRooms] = useState<any[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [stats, setStats] = useState({
     activeOrders: 0,
     occupiedRooms: 0,
@@ -97,18 +101,37 @@ export default function WaiterDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Room Cards */}
           <div className="lg:col-span-3 space-y-4">
-            <h3 className="text-xl font-semibold">Ruangan</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {rooms.map((room) => (
-                <RoomCard
-                  key={room.id}
-                  room={room}
-                  onClick={() => handleRoomClick(room)}
-                />
-              ))}
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">Ruangan</h3>
+              <Button
+                size="sm"
+                onClick={() => setQuickActionsOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4" />
+                <span className="hidden sm:inline">Aksi Cepat</span>
+              </Button>
             </div>
 
-            {rooms.length === 0 && (
+            {rooms.length > 0 ? (
+              <StaggeredGrid
+                columns={{ default: 1, md: 2, xl: 3 }}
+                className="grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+              >
+                {rooms.map((room) => (
+                  <Suspense 
+                    key={room.id} 
+                    fallback={<Skeleton className="h-48 rounded-xl" />}
+                  >
+                    <ExpandableRoomCard
+                      room={room}
+                      onAddItems={() => handleRoomClick(room)}
+                      onExtendTime={() => handleRoomClick(room)}
+                    />
+                  </Suspense>
+                ))}
+              </StaggeredGrid>
+            ) : (
               <div className="text-center py-12 bg-muted/30 rounded-lg border-2 border-dashed">
                 <p className="text-lg font-medium mb-2">Tidak ada ruangan tersedia</p>
                 <p className="text-sm text-muted-foreground">
@@ -130,6 +153,17 @@ export default function WaiterDashboard() {
           room={selectedRoom}
           open={detailOpen}
           onOpenChange={setDetailOpen}
+        />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <QuickActionsSheet
+          open={quickActionsOpen}
+          onOpenChange={setQuickActionsOpen}
+          onAddOrder={() => {
+            const occupiedRoom = rooms.find(r => r.status === "occupied");
+            if (occupiedRoom) handleRoomClick(occupiedRoom);
+          }}
         />
       </Suspense>
     </DashboardLayout>
