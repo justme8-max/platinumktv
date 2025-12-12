@@ -107,8 +107,8 @@ const DashboardLayout = memo(function DashboardLayout({ children, role }: Dashbo
           </div>
           
           <div className="flex items-center gap-2">
-            {/* Demo Mode Toggle - Compact */}
-            <DemoModeToggle variant="compact" className="hidden md:flex" />
+            {/* Demo Mode Toggle */}
+            <DemoModeToggle className="hidden md:flex" />
             
             {/* Theme Toggle */}
             <Button 
@@ -135,7 +135,7 @@ const DashboardLayout = memo(function DashboardLayout({ children, role }: Dashbo
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="p-2 md:hidden">
-                  <DemoModeToggle variant="compact" />
+                  <DemoModeToggle />
                 </div>
                 <DropdownMenuSeparator className="md:hidden" />
                 <DropdownMenuItem onClick={toggleTheme}>

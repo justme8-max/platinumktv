@@ -26,17 +26,9 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
   const toggleDemoMode = () => {
     setIsDemoMode((prev) => {
       const newValue = !prev;
-      if (newValue) {
-        toast.info("Demo Mode aktif - Data simulasi ditampilkan", {
-          duration: 3000,
-          icon: "🎭",
-        });
-      } else {
-        toast.success("Demo Mode nonaktif - Data live", {
-          duration: 3000,
-          icon: "✅",
-        });
-      }
+      toast.info(newValue ? "Demo Mode aktif" : "Demo Mode nonaktif", {
+        duration: 2000,
+      });
       return newValue;
     });
   };
