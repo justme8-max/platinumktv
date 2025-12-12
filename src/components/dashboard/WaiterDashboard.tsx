@@ -15,18 +15,9 @@ import { toast } from "sonner";
 import RoomCard from "./RoomCard";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { DEMO_ROOMS, DEMO_STATS } from "@/data/demoData";
 
 const WaiterRoomDetailCard = lazy(() => import("@/components/waiter/WaiterRoomDetailCard"));
-
-// Demo data for testing without database
-const DEMO_ROOMS = [
-  { id: "demo-1", room_number: "101", room_name: "VIP Room 1", room_type: "VIP", capacity: 10, hourly_rate: 500000, status: "available" as const },
-  { id: "demo-2", room_number: "102", room_name: "VIP Room 2", room_type: "VIP", capacity: 8, hourly_rate: 450000, status: "occupied" as const, current_session_start: new Date(Date.now() - 3600000).toISOString() },
-  { id: "demo-3", room_number: "201", room_name: "Regular Room 1", room_type: "Regular", capacity: 6, hourly_rate: 200000, status: "available" as const },
-  { id: "demo-4", room_number: "202", room_name: "Regular Room 2", room_type: "Regular", capacity: 6, hourly_rate: 200000, status: "maintenance" as const },
-  { id: "demo-5", room_number: "301", room_name: "Executive Suite", room_type: "Executive", capacity: 15, hourly_rate: 800000, status: "reserved" as const },
-  { id: "demo-6", room_number: "302", room_name: "Party Room", room_type: "Party", capacity: 20, hourly_rate: 1000000, status: "cleaning" as const },
-];
 
 interface Room {
   id: string;
@@ -54,7 +45,11 @@ const WaiterDashboard = memo(function WaiterDashboard() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [stats, setStats] = useState<Stats>({
+  const [stats, setStats] = useState<Stats>(() => isDemoMode ? {
+    activeOrders: DEMO_STATS.activeOrders,
+    occupiedRooms: DEMO_STATS.occupiedRooms,
+    pendingItems: DEMO_STATS.pendingItems,
+  } : {
     activeOrders: 0,
     occupiedRooms: 0,
     pendingItems: 0,
@@ -64,11 +59,11 @@ const WaiterDashboard = memo(function WaiterDashboard() {
     try {
       // Use demo data if demo mode is active
       if (isDemoMode) {
-        setRooms(DEMO_ROOMS);
+        setRooms(DEMO_ROOMS as Room[]);
         setStats({
-          activeOrders: 3,
-          occupiedRooms: DEMO_ROOMS.filter(r => r.status === "occupied").length,
-          pendingItems: 12,
+          activeOrders: DEMO_STATS.activeOrders,
+          occupiedRooms: DEMO_STATS.occupiedRooms,
+          pendingItems: DEMO_STATS.pendingItems,
         });
         return;
       }

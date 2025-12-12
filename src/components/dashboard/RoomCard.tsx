@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, Users, Timer, Info, UserCircle, Receipt } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import { formatIDR } from "@/lib/currency";
 import { useRoomTimer } from "@/hooks/useRoomTimer";
 import { useState, useEffect } from "react";
@@ -31,6 +32,7 @@ interface RoomCardProps {
 
 export default function RoomCard({ room, onClick }: RoomCardProps) {
   const { t } = useLanguage();
+  const { isDemoMode } = useDemoMode();
   const { timeRemaining, isLowTime } = useRoomTimer(room.id, room.status);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [waiterName, setWaiterName] = useState<string | null>(null);
@@ -39,32 +41,32 @@ export default function RoomCard({ room, onClick }: RoomCardProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Skip fetching in demo mode
+    if (isDemoMode || !room.waiter_id) return;
     const fetchWaiterInfo = async () => {
-      if (room.waiter_id) {
-        // Get waiter name
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', room.waiter_id)
-          .single();
-        
-        if (profile) {
-          setWaiterName(profile.full_name);
-        }
-
-        // Check if waiter is busy (assigned to occupied rooms)
-        const { data: assignments } = await supabase
-          .from('rooms')
-          .select('status')
-          .eq('waiter_id', room.waiter_id)
-          .eq('status', 'occupied');
-        
-        setWaiterBusy((assignments?.length || 0) > 0);
+      // Get waiter name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', room.waiter_id)
+        .single();
+      
+      if (profile) {
+        setWaiterName(profile.full_name);
       }
+
+      // Check if waiter is busy (assigned to occupied rooms)
+      const { data: assignments } = await supabase
+        .from('rooms')
+        .select('status')
+        .eq('waiter_id', room.waiter_id)
+        .eq('status', 'occupied');
+      
+      setWaiterBusy((assignments?.length || 0) > 0);
     };
 
     fetchWaiterInfo();
-  }, [room.waiter_id]);
+  }, [room.waiter_id, isDemoMode]);
 
   const statusConfig = {
     available: {

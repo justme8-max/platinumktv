@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import DashboardLayout from "./DashboardLayout";
 import TaskManagement from "@/components/tasks/TaskManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,18 +15,23 @@ import CashDrawerManagement from "@/components/cashier/CashDrawerManagement";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, PercentSquare } from "lucide-react";
 import { toast } from "sonner";
-import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
 import DemoDataManager from "@/components/admin/DemoDataManager";
+import { DEMO_ROOMS, DEMO_STATS, DemoRoom } from "@/data/demoData";
 
 export default function CashierDashboard() {
   const { t } = useLanguage();
-  const [stats, setStats] = useState({
+  const { isDemoMode } = useDemoMode();
+  const [stats, setStats] = useState(() => isDemoMode ? {
+    todayTransactions: DEMO_STATS.todayTransactions,
+    todayRevenue: DEMO_STATS.todayRevenue,
+    activeRooms: DEMO_STATS.activeRooms,
+  } : {
     todayTransactions: 0,
     todayRevenue: 0,
     activeRooms: 0,
   });
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>(() => isDemoMode ? DEMO_ROOMS : []);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [addItemsOpen, setAddItemsOpen] = useState(false);
@@ -33,6 +39,17 @@ export default function CashierDashboard() {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
   useEffect(() => {
+    // Skip real data loading in demo mode
+    if (isDemoMode) {
+      setRooms(DEMO_ROOMS as any[]);
+      setStats({
+        todayTransactions: DEMO_STATS.todayTransactions,
+        todayRevenue: DEMO_STATS.todayRevenue,
+        activeRooms: DEMO_STATS.activeRooms,
+      });
+      return;
+    }
+    
     loadDashboardData();
 
     // Setup realtime subscriptions
@@ -109,7 +126,7 @@ export default function CashierDashboard() {
       supabase.removeChannel(transactionsChannel);
       supabase.removeChannel(salesChannel);
     };
-  }, []);
+  }, [isDemoMode]);
 
   const loadDashboardData = async () => {
     // Load rooms
