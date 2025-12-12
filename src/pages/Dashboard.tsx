@@ -10,14 +10,14 @@ import AccountantDashboard from "@/components/dashboard/AccountantDashboard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
-const dashboardComponents: { [key: string]: () => JSX.Element } = {
+const dashboardComponents: { [key: string]: React.ComponentType } = {
   owner: OwnerDashboard,
   manager: ManagerDashboard,
   cashier: CashierDashboard,
   waiter: WaiterDashboard,
   waitress: WaiterDashboard,
   accountant: AccountantDashboard,
-  hrd: ManagerDashboard, // HRD uses manager dashboard
+  hrd: ManagerDashboard,
 };
 
 export default function Dashboard() {

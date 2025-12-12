@@ -6,22 +6,41 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { DemoModeProvider } from "@/contexts/DemoModeContext";
+import { ThemeProvider } from "next-themes";
 import PWAInstallPrompt from "@/components/common/PWAInstallPrompt";
 import FloatingChatButton from "@/components/chat/FloatingChatButton";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Bookings from "./pages/Bookings";
-import RecurringBookings from "./pages/RecurringBookings";
-import Analytics from "./pages/Analytics";
-import Install from "./pages/Install";
-import NotFound from "./pages/NotFound";
-import CashierRoomDetail from "./pages/cashier/RoomDetail";
-import WaiterRoomDetail from "./pages/waiter/RoomDetail";
-import CustomerDisplayPage from "./pages/CustomerDisplay";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
+import { lazy, Suspense } from "react";
+import { GlobalLoadingState } from "@/components/common/GlobalLoadingState";
 
-const queryClient = new QueryClient();
+// Lazy load pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Bookings = lazy(() => import("./pages/Bookings"));
+const RecurringBookings = lazy(() => import("./pages/RecurringBookings"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Install = lazy(() => import("./pages/Install"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const CashierRoomDetail = lazy(() => import("./pages/cashier/RoomDetail"));
+const WaiterRoomDetail = lazy(() => import("./pages/waiter/RoomDetail"));
+const CustomerDisplayPage = lazy(() => import("./pages/CustomerDisplay"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 function AuthStateListener() {
   const navigate = useNavigate();
@@ -29,6 +48,8 @@ function AuthStateListener() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
+        // Clear any cached data
+        queryClient.clear();
         navigate('/login');
       } else if (event === 'SIGNED_IN' && window.location.pathname === '/login') {
         navigate('/dashboard');
@@ -48,35 +69,47 @@ function ConditionalFloatingChat() {
   return showChat ? <FloatingChatButton /> : null;
 }
 
+// Page loading fallback
+function PageLoader() {
+  return <GlobalLoadingState isLoading={true} message="Memuat halaman..." variant="overlay" />;
+}
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <PWAInstallPrompt />
-      <BrowserRouter>
-          <AuthStateListener />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/cashier/room/:roomId" element={<CashierRoomDetail />} />
-            <Route path="/waiter/room/:roomId" element={<WaiterRoomDetail />} />
-            <Route path="/customer-display" element={<CustomerDisplayPage />} />
-            <Route path="/bookings" element={<Bookings />} />
-            <Route path="/recurring-bookings" element={<RecurringBookings />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/install" element={<Install />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <ConditionalFloatingChat />
-        </BrowserRouter>
-      </TooltipProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <LanguageProvider>
+          <DemoModeProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <PWAInstallPrompt />
+              <BrowserRouter>
+                <AuthStateListener />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/cashier/room/:roomId" element={<CashierRoomDetail />} />
+                    <Route path="/waiter/room/:roomId" element={<WaiterRoomDetail />} />
+                    <Route path="/customer-display" element={<CustomerDisplayPage />} />
+                    <Route path="/bookings" element={<Bookings />} />
+                    <Route path="/recurring-bookings" element={<RecurringBookings />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/install" element={<Install />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+                <ConditionalFloatingChat />
+              </BrowserRouter>
+            </TooltipProvider>
+          </DemoModeProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
