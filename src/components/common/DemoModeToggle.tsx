@@ -1,7 +1,6 @@
-import { Switch } from "@/components/ui/switch";
 import { useDemoMode } from "@/contexts/DemoModeContext";
 import { cn } from "@/lib/utils";
-import { Play } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface DemoModeToggleProps {
   className?: string;
@@ -11,22 +10,37 @@ export default function DemoModeToggle({ className }: DemoModeToggleProps) {
   const { isDemoMode, toggleDemoMode } = useDemoMode();
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <Play className={cn(
-        "h-4 w-4 transition-colors",
-        isDemoMode ? "text-primary fill-primary" : "text-muted-foreground"
-      )} />
-      <span className={cn(
-        "text-sm font-medium transition-colors",
-        isDemoMode ? "text-primary" : "text-muted-foreground"
-      )}>
-        Demo
-      </span>
-      <Switch
-        checked={isDemoMode}
-        onCheckedChange={toggleDemoMode}
-        className="data-[state=checked]:bg-primary"
+    <button
+      onClick={toggleDemoMode}
+      className={cn(
+        "relative flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300",
+        "border text-sm font-medium",
+        isDemoMode 
+          ? "bg-primary/10 border-primary text-primary" 
+          : "bg-muted/50 border-border text-muted-foreground hover:bg-muted hover:text-foreground",
+        className
+      )}
+    >
+      {/* Animated indicator dot */}
+      <motion.span
+        className={cn(
+          "h-2 w-2 rounded-full",
+          isDemoMode ? "bg-primary" : "bg-muted-foreground/50"
+        )}
+        animate={isDemoMode ? {
+          scale: [1, 1.2, 1],
+          opacity: [1, 0.7, 1],
+        } : {}}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
       />
-    </div>
+      
+      <span className="tracking-wide">
+        {isDemoMode ? "DEMO" : "LIVE"}
+      </span>
+    </button>
   );
 }
