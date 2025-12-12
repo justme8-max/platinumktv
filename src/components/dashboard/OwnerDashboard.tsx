@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
 import QuickActions from "./QuickActions";
@@ -20,10 +21,26 @@ import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 import { formatIDR } from "@/lib/currency";
 import UserRoleManagement from "@/components/admin/UserRoleManagement";
 import WaiterAssignment from "@/components/admin/WaiterAssignment";
+import { DEMO_ROOMS, DEMO_STATS, DEMO_TRANSACTIONS } from "@/data/demoData";
 
 export default function OwnerDashboard() {
   const { t } = useLanguage();
-  const [stats, setStats] = useState({
+  const { isDemoMode } = useDemoMode();
+  
+  const demoStats = {
+    revenue: DEMO_STATS.todayRevenue,
+    dailyRevenue: DEMO_STATS.todayRevenue,
+    monthlyRevenue: DEMO_STATS.todayRevenue * 25,
+    yearlyRevenue: DEMO_STATS.todayRevenue * 300,
+    dailyGrowth: 12.5,
+    monthlyGrowth: 8.3,
+    yearlyGrowth: 15.2,
+    rooms: DEMO_ROOMS.length,
+    activeUsers: 25,
+    occupancy: Math.round((DEMO_ROOMS.filter(r => r.status === "occupied").length / DEMO_ROOMS.length) * 100),
+  };
+
+  const [stats, setStats] = useState(() => isDemoMode ? demoStats : {
     revenue: 0,
     dailyRevenue: 0,
     monthlyRevenue: 0,
@@ -35,7 +52,7 @@ export default function OwnerDashboard() {
     activeUsers: 0,
     occupancy: 0,
   });
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>(() => isDemoMode ? DEMO_ROOMS : []);
   const [employees, setEmployees] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<any>(null);
@@ -44,8 +61,13 @@ export default function OwnerDashboard() {
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
 
   useEffect(() => {
+    if (isDemoMode) {
+      setStats(demoStats);
+      setRooms(DEMO_ROOMS as any[]);
+      return;
+    }
     loadDashboardData();
-  }, []);
+  }, [isDemoMode]);
 
   const loadDashboardData = async () => {
     // Load rooms

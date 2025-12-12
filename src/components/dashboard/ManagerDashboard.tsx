@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useDemoMode } from "@/contexts/DemoModeContext";
 import DashboardLayout from "./DashboardLayout";
 import StatsCard from "./StatsCard";
 import QuickActions from "./QuickActions";
@@ -15,14 +16,23 @@ import EmployeeList from "@/components/employees/EmployeeList";
 import { formatIDR } from "@/lib/currency";
 import DemoDataManager from "@/components/admin/DemoDataManager";
 import WaiterAssignment from "@/components/admin/WaiterAssignment";
+import { DEMO_ROOMS, DEMO_STATS } from "@/data/demoData";
 
 export default function ManagerDashboard() {
-  const [stats, setStats] = useState({
+  const { isDemoMode } = useDemoMode();
+  
+  const demoStats = {
+    todayRevenue: DEMO_STATS.todayRevenue,
+    todayExpenses: 1250000,
+    occupiedRooms: DEMO_STATS.occupiedRooms,
+  };
+
+  const [stats, setStats] = useState(() => isDemoMode ? demoStats : {
     todayRevenue: 0,
     todayExpenses: 0,
     occupiedRooms: 0,
   });
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>(() => isDemoMode ? DEMO_ROOMS : []);
   const [employees, setEmployees] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState<any>(null);
@@ -30,8 +40,13 @@ export default function ManagerDashboard() {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   useEffect(() => {
+    if (isDemoMode) {
+      setStats(demoStats);
+      setRooms(DEMO_ROOMS as any[]);
+      return;
+    }
     loadDashboardData();
-  }, []);
+  }, [isDemoMode]);
 
   const loadDashboardData = async () => {
     // Load rooms
